@@ -1,0 +1,314 @@
+BasicInfo:
+  Title                   : "$(APP_TITLE)"
+  CompanyCode             : "00"
+  ProductCode             : "$(APP_PRODUCT_CODE)"
+  ContentType             : Application
+  Logo                    : Nintendo # Nintendo / Licensed / Distributed / iQue / iQueForSystem
+
+TitleInfo:
+  UniqueId                : $(APP_UNIQUE_ID)
+  Category                : Application
+  Variation               : "00"
+
+CardInfo:
+  MediaSize               : 128MB # 128MB / 256MB / 512MB / 1GB / 2GB / 4GB / 8GB / 16GB / 32GB
+  MediaType               : Card1 # Card1 / Card2
+  CardDevice              : None # NorFlash(Pick this if you use savedata) / None
+
+Option:
+  UseOnSD                 : true # true if App is to be installed to SD
+  FreeProductCode         : true # Removes limitations on ProductCode
+  MediaFootPadding        : false # If true CCI files are created with padding
+  EnableCrypt             : false # Enables encryption for NCCH and CIA
+  EnableCompress          : true # Compresses exefs code
+
+ExeFs: # these are the program segments from the ELF, check your elf for the appropriate segment names
+  ReadOnly: 
+   - .rodata
+   - RO
+  ReadWrite: 
+   - .data
+   - RO
+  Text: 
+   - .init
+   - .text
+   - STUP_ENTRY
+   
+PlainRegion: # only used with SDK ELFs 
+  #- .module_id
+
+#Rom:
+  # Specifies the root path of the file system to include in the ROM.
+  # HostRoot                : "romfs"
+
+AccessControlInfo:
+  # UseOtherVariationSaveData : true
+  # UseExtSaveData : true
+  # ExtSaveDataId: 0xffffffff
+  # SystemSaveDataId1: 0x220
+  # SystemSaveDataId2: 0x00040010
+  # OtherUserSaveDataId1: 0x220
+  # OtherUserSaveDataId2: 0x330
+  # OtherUserSaveDataId3: 0x440
+  # UseExtendedSaveDataAccessControl: true
+  # AccessibleSaveDataIds: [0x101, 0x202, 0x303, 0x404, 0x505, 0x606]
+  FileSystemAccess:
+   # - CategorySystemApplication
+   # - CategoryHardwareCheck
+   - CategoryFileSystemTool
+   - Debug
+   # - TwlCardBackup
+   # - TwlNandData
+   # - Boss
+   - DirectSdmc
+   # - Core
+   # - CtrNandRo
+   # - CtrNandRw
+   # - CtrNandRoWrite
+   # - CategorySystemSettings
+   # - CardBoard
+   # - ExportImportIvs
+   - DirectSdmcWrite
+   # - SwitchCleanup
+   # - SaveDataMove
+   # - Shop
+   # - Shell
+   # - CategoryHomeMenu
+  IoAccessControl:
+   # - FsMountNand
+   # - FsMountNandRoWrite
+   # - FsMountTwln
+   # - FsMountWnand
+   # - FsMountCardSpi
+   # - UseSdif3
+   # - CreateSeed
+   # - UseCardSpi
+   
+  IdealProcessor                : 0
+  AffinityMask                  : 1
+  
+  Priority                      : 16
+
+  MaxCpu                        : 0x9E # Default
+  
+  DisableDebug                  : true
+  EnableForceDebug              : true
+  CanWriteSharedPage            : true
+  CanUsePrivilegedPriority      : false
+  CanUseNonAlphabetAndNumber    : true
+  PermitMainFunctionArgument    : true
+  CanShareDeviceMemory          : true
+  RunnableOnSleep               : false
+  SpecialMemoryArrange          : true
+  
+  CoreVersion                   : 2
+  DescVersion                   : 2
+  
+  ReleaseKernelMajor            : "02"
+  ReleaseKernelMinor            : "33" 
+  MemoryType                    : Application # Application / System / Base
+  HandleTableSize: 512
+  IORegisterMapping: 
+   - 1ff50000-1ff57fff
+   - 1ff70000-1ff77fff
+  MemoryMapping: 
+   - 1f000000-1f5fffff:r
+  SystemCallAccess: 
+    ControlMemory: 1 # 0x01
+    QueryMemory: 2 # 0x02
+    ExitProcess: 3 # 0x03
+#  GetProcessAffinityMask: 4 # 0x04
+#  SetProcessAffinityMask: 5 # 0x05
+    GetProcessIdealProcessor: 6 # 0x06
+#  SetProcessIdealProcessor: 7 # 0x07
+    CreateThread: 8 # 0x08
+    ExitThread: 9 # 0x09
+    SleepThread: 10 # 0x0A
+    GetThreadPriority: 11 # 0x0B
+    SetThreadPriority: 12 # 0x0C
+#  GetThreadAffinityMask: 13 # 0x0D
+#  SetThreadAffinityMask: 14 # 0x0E
+    GetThreadIdealProcessor: 15 # 0x0F
+#  SetThreadIdealProcessor: 16 # 0x10
+    GetCurrentProcessorNumber: 17 # 0x11
+#  Run: 18 # 0x12
+    CreateMutex: 19 # 0x13
+    ReleaseMutex: 20 # 0x14
+    CreateSemaphore: 21 # 0x15
+    ReleaseSemaphore: 22 # 0x16
+    CreateEvent: 23 # 0x17
+    SignalEvent: 24 # 0x18
+    ClearEvent: 25 # 0x19
+    CreateTimer: 26 # 0x1A
+    SetTimer: 27 # 0x1B
+    CancelTimer: 28 # 0x1C
+    ClearTimer: 29 # 0x1D
+    CreateMemoryBlock: 30 # 0x1E
+    MapMemoryBlock: 31 # 0x1F
+    UnmapMemoryBlock: 32 # 0x20
+    CreateAddressArbiter: 33 # 0x21
+    ArbitrateAddress: 34 # 0x22
+    CloseHandle: 35 # 0x23
+    WaitSynchronization1: 36 # 0x24
+    WaitSynchronizationN: 37 # 0x25
+#  SignalAndWait: 38 # 0x26
+    DuplicateHandle: 39 # 0x27
+    GetSystemTick: 40 # 0x28
+    GetHandleInfo: 41 # 0x29
+    GetSystemInfo: 42 # 0x2A
+    GetProcessInfo: 43 # 0x2B
+    GetThreadInfo: 44 # 0x2C
+    ConnectToPort: 45 # 0x2D
+    SendSyncRequest1: 46 # 0x2E
+    SendSyncRequest2: 47 # 0x2F
+    SendSyncRequest3: 48 # 0x30
+    SendSyncRequest4: 49 # 0x31
+    SendSyncRequest: 50 # 0x32
+#  OpenProcess: 51 # 0x33
+#  OpenThread: 52 # 0x34
+    GetProcessId: 53 # 0x35
+    GetProcessIdOfThread: 54 # 0x36
+    GetThreadId: 55 # 0x37
+    GetResourceLimit: 56 # 0x38
+    GetResourceLimitLimitValues: 57 # 0x39
+    GetResourceLimitCurrentValues: 58 # 0x3A
+    GetThreadContext: 59 # 0x3B
+    Break: 60 # 0x3C
+    OutputDebugString: 61 # 0x3D
+#  ControlPerformanceCounter: 62 # 0x3E
+#  CreatePort: 71 # 0x47
+#  CreateSessionToPort:72 # 0x48
+#  CreateSession: 73 # 0x49
+#  AcceptSession: 74 # 0x4A
+#  ReplyAndReceive1: 75 # 0x4B
+#  ReplyAndReceive2: 76 # 0x4C
+#  ReplyAndReceive3: 77 # 0x4D
+#  ReplyAndReceive4: 78 # 0x4E
+#  ReplyAndReceive: 79 # 0x4F
+#  BindInterrupt: 80 # 0x50
+#  UnbindInterrupt: 81 # 0x51
+#  InvalidateProcessDataCache: 82 # 0x52
+#  StoreProcessDataCache: 83 # 0x53
+#  FlushProcessDataCache: 84 # 0x54
+#  StartInterProcessDma: 85 # 0x55
+#  StopDma: 86 # 0x56
+#  GetDmaState: 87 # 0x57
+#  RestartDma: 88 # 0x58
+    DebugActiveProcess: 96 # 0x60
+#  BreakDebugProcess: 97 # 0x61
+#  TerminateDebugProcess: 98 # 0x62
+#  GetProcessDebugEvent: 99 # 0x63
+#  ContinueDebugEvent: 100 # 0x64
+#  GetProcessList: 101 # 0x65
+#  GetThreadList: 102 # 0x66
+#  GetDebugThreadContext: 103 # 0x67
+#  SetDebugThreadContext: 104 # 0x68
+#  QueryDebugProcessMemory: 105 # 0x69
+#  ReadProcessMemory: 106 # 0x6A
+    WriteProcessMemory: 107 # 0x6B
+#  SetHardwareBreakPoint: 108 # 0x6C
+#  GetDebugThreadParam: 109 # 0x6D
+#  ControlProcessMemory: 112 # 0x70
+#  MapProcessMemory: 113 # 0x71
+#  UnmapProcessMemory: 114 # 0x72
+#  CreateCodeSet: 115 # 0x73
+#  RandomStub: 116 # 0x74
+#  CreateProcess: 117 # 0x75
+#  TerminateProcess: 118 # 0x76
+#  SetProcessResourceLimits: 119 # 0x77
+#  CreateResourceLimit: 120 # 0x78
+#  SetResourceLimitValues: 121 # 0x79
+#  AddCodeSegment: 122 # 0x7A
+    Backdoor: 123 # 0x7B
+#  KernelSetState: 124 # 0x7C
+#  QueryProcessMemory: 125 # 0x7D
+  InterruptNumbers:
+  ServiceAccessControl: 
+   - APT:U
+   - $hioFIO
+   - $hostio0
+   - $hostio1
+   - ac:u
+   - boss:U
+   - cam:u
+   - cecd:u
+   - cfg:u
+   - dlp:FKCL
+   - dlp:SRVR
+   - dsp::DSP
+   - frd:u
+   - fs:USER
+#   - fs:LDR
+#   - fs:REG
+   - gsp::Gpu
+   - hid:USER
+   - http:C
+   - mic:u
+   - ndm:u
+   - news:u
+   - nwm::UDS
+   - ptm:u
+   - pxi:dev
+   - soc:U
+   - ssl:C
+   - y2r:u
+   - ldr:ro
+   - ir:USER
+#   - nim:aoc
+#   - am:app
+   - ir:u
+   - csnd:SND
+   - am:u
+#   - PxiFS0
+#   - PxiFS1
+#   - PxiFSB
+#   - PxiFSR
+#   - PxiPM
+#   - pxi:am9
+#   - pxi:dev
+#   - pxi:mc
+#   - pxi:ps9
+#   - am:net
+#   - am:u
+#   - am:sys
+#   - am:pipe
+#   - pm:app
+#   - pm:dbg
+
+SystemControlInfo:
+  SaveDataSize: 0KB # It doesn't use any save data.
+  RemasterVersion: 2
+  StackSize: 0x40000
+  # JumpId: 0
+  Dependency: 
+    ac: 0x0004013000002402L
+    act: 0x0004013000003802L
+    am: 0x0004013000001502L
+    boss: 0x0004013000003402L
+    camera: 0x0004013000001602L
+    cecd: 0x0004013000002602L
+    cfg: 0x0004013000001702L
+    codec: 0x0004013000001802L
+    csnd: 0x0004013000002702L
+    dlp: 0x0004013000002802L
+    dsp: 0x0004013000001a02L
+    friends: 0x0004013000003202L
+    gpio: 0x0004013000001b02L
+    gsp: 0x0004013000001c02L
+    hid: 0x0004013000001d02L
+    http: 0x0004013000002902L
+    i2c: 0x0004013000001e02L
+    ir: 0x0004013000003302L
+    mcu: 0x0004013000001f02L
+    mic: 0x0004013000002002L
+    ndm: 0x0004013000002b02L
+    news: 0x0004013000003502L
+    nim: 0x0004013000002c02L
+    nwm: 0x0004013000002d02L
+    pdn: 0x0004013000002102L
+    ps: 0x0004013000003102L
+    ptm: 0x0004013000002202L
+    ro: 0x0004013000003702L
+    socket: 0x0004013000002e02L
+    spi: 0x0004013000002302L
+    ssl: 0x0004013000002f02L
