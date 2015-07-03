@@ -5,10 +5,10 @@ This application for the 3DS allows to patch systemmodules while using system or
 
 ### Dependencies
 
-[ctrcommon](https://github.com/Steveice10/ctrcommon)
-ctrcommons rsf template needs to be replaces by this repos template(will be changed later).
+* [ctrcommon](https://github.com/Steveice10/ctrcommon) 
+* ctrcommons rsf template needs to be replaces by this repos template(will be changed later).
 
 
 ### Credits
-base application: 	[YGW Eshop Spoofer (Y a Gateway!?)](https://github.com/felipejfc/ygw-eshop-spoofer) by [felipejfc](https://github.com/felipejfc)
-region free:		[rxtools](https://github.com/roxas75/rxTools) by [roxas](https://github.com/roxas75/rxTools)
+* base application: 	[YGW Eshop Spoofer (Y a Gateway!?)](https://github.com/felipejfc/ygw-eshop-spoofer) by [felipejfc](https://github.com/felipejfc)
+* region free:		[rxtools](https://github.com/roxas75/rxTools) by [roxas](https://github.com/roxas75/rxTools)
