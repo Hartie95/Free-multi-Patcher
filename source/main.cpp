@@ -33,7 +33,7 @@ bool applyPatches(bool patchlist[]){
 
   if(patchlist[REGIONFREE]==true)
   {
-    if(!KernelBackdoor(patchMenu)){
+    if(!KernelBackdoor(patchRegionFree)){
       gputDrawString("patch applied!", (gpuGetViewportWidth() - gputGetStringWidth("patch applied!", 8)) / 2 + 25, 70, 8, 8, 0 ,0 ,0);
     }
   }
