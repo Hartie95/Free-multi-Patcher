@@ -24,7 +24,7 @@ struct menuEntry{
 static const menuEntry menu[]={	{"e-shop spoof     ",	"Patches nim for E-Shop access       ", SETTING},
 								{"region patch     ",	"Patches the home menu to show out of\nregion games and nim to ignore out of\nregion Updates", SETTING},
 								{"no auto download ",	"Patches nim to stop automatic update\ndownload\n(Might be unstable)", SETTING},
-								{"serial patch",		"Patches the serial to allow E-Shop  \nacces after region change\n(not implemented)", PLACEHOLDER},
+								{"serial patch     ",	"Patches the serial to allow E-Shop  \nacces after region change\n(not implemented)", PLACEHOLDER},
 								{"save",				"Save current selection for later use", SAVE},
 								{"exit",				"Exit without applying patches       ", EXIT}
 							};

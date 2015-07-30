@@ -2,14 +2,14 @@
 
 #include <3ds.h>
 
-int PatchPid();
+/*int PatchPid();
 int UnpatchPid();
 void ReinitSrv();
-void PatchSrvAccess();
+void PatchSrvAccess();*/
 int patchNimEshop();
 int patchNimAutoUpdate();
 int patchRegionFree();
 int patchMenu();
 int patchNs();
 //int patchDlp();
-//int changeSerial();
+int changeSerial();
