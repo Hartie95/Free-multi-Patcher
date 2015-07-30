@@ -9,7 +9,7 @@
 #include "kobjects.h"
 
 //-----------------------------------------------------------------------------
-
+/*
 u32 self_pid = 0;
 
 int PatchPid()
@@ -46,7 +46,7 @@ void PatchSrvAccess()
     // Cleanup; won't take effect until srv is reinitialized
     KernelBackdoor(UnpatchPid);
 }
-
+*/
 //-----------------------------------------------------------------------------
 
 int findAndPatchCode( const char* titleId, short titleIdSize,  const u32 startAddress, const u32 area,  unsigned char originalcode[], const char patchcode[],u32 patchcodeSize)
@@ -185,7 +185,7 @@ int patchNs()
     return 0;
 }
 /*
-Todo:
+Todo: find offsets
 int patchDlp()
 {
     // Set generell informations for patching
@@ -203,31 +203,23 @@ int patchDlp()
 
 /*
 Todo:
-//doesnt work atm(crashes)
+//doesnt work atm(crashes)*/
 int changeSerial()
 {
     // Target title id
     //change console Serial
-    static const char * title_id = "cfg";
-    static const u32 patch_offset = 0x0fefffd5;
+    static const char * titleIdCfg = "cfg";
+    static const u32 startAddressCfg = 0x0fefffd5;
     
-    static const char * title_id2 = "act";
-    static const u32 patch_offset2 = 0x0003E74C;
+    static const char * titleIdAct = "act";                           
+    static const u32 startAddressAct = 0x0003E74C;
 
-    static const char serial[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    //todo read from file
+    static unsigned char orgSerial[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    static char serial[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     
-    KCodeSet* code_set = FindTitleCodeSet(title_id,3);
-    if (code_set == nullptr)
-        return 1;
-
-     KCodeSet* code_set2 = FindTitleCodeSet(title_id2,3);
-    if (code_set2 == nullptr)
-        return 1;
-
-    void * destination = (u64*)FindCodeOffsetKAddr(code_set, patch_offset);
-    void * destination2 = (u64*)FindCodeOffsetKAddr(code_set2, patch_offset2);
-    memcpy(destination, serial, sizeof(serial));
-    memcpy(destination2, serial, sizeof(serial));
+    findAndReplace(titleIdCfg, 3, startAddressCfg, 0x00000010, 1, orgSerial, sizeof(orgSerial), serial, sizeof(serial));
+    findAndReplace(titleIdAct, 3, startAddressAct, 0x00000030, 1, orgSerial, sizeof(orgSerial), serial, sizeof(serial));
 
     return 0;
-}*/
+}

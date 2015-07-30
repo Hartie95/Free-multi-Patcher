@@ -21,7 +21,7 @@ static const string settingsFileName="settings.cfg";
 
 bool applyPatches(bool patchlist[]){
   SaveVersionConstants();
-  PatchSrvAccess();
+  //PatchSrvAccess();
   gputDrawString("srv patched", (gpuGetViewportWidth() - gputGetStringWidth("srv patched", 8)) / 2, 130, 8, 8, 0 ,0 ,0);
 
   if(patchlist[ESHOPSPOOF]==true)
@@ -44,6 +44,14 @@ bool applyPatches(bool patchlist[]){
       gputDrawString("patch applied!", (gpuGetViewportWidth() - gputGetStringWidth("patch applied!", 8)) / 2 + 50, 70, 8, 8, 0 ,0 ,0);
     }
   }
+  
+  //will crash
+  /*if(patchlist[SERIALCHANGE]==true)
+  {
+    if(!KernelBackdoor(changeSerial)){
+      gputDrawString("patch applied!", (gpuGetViewportWidth() - gputGetStringWidth("patch applied!", 8)) / 2 + 50, 70, 8, 8, 0 ,0 ,0);
+    }
+  }*/
 
   HB_FlushInvalidateCache(); // Just to be sure!
 
