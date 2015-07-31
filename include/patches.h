@@ -13,3 +13,5 @@ int patchMenu();
 int patchNs();
 //int patchDlp();
 int changeSerial();
+
+void test();

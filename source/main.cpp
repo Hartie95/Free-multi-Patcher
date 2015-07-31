@@ -102,6 +102,7 @@ int main(int argc, char **argv) {
    
   short exitLoop=false;
 
+  test();
   while(platformIsRunning()&&exitLoop==false) {
     //Todo: replace with switch case
     inputPoll();
@@ -132,6 +133,7 @@ int main(int argc, char **argv) {
           break;
       }      
     }
+    
 
     if(inputIsPressed(BUTTON_START)) {
       applyPatches(patchlist);
