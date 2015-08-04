@@ -1,104 +1,90 @@
 #include <sstream>
-#include "menu.h"
 #include <ctrcommon/gpu.hpp>
+
+#include "menu.h"
+#include "patches.h"
 
 using namespace std;
 
-static int selection = 0;
-
-string getValueString(bool value)
+//static int selection = 0;
+Menu::Menu()
 {
-	if(value==true)
-		return "on ";
-	else
-		return "off";	
+  this->currentSelection=0;  
+  menuEntry back = {"exit",        "Exit without applying patches       ",nullptr, EXIT};
+  this->menuEntrys.push_back(back);
+  this->menuEntrys.push_back(back);
+  this->menuEntrys.push_back(back);
+
 }
 
-void menuChageSelection(string direction)
+string Menu::getValueString(bool value)
 {
-	if(direction=="up")
-	{
-		if(selection>0)
-			selection --;
-	}
-	else if(direction=="down")
-	{
-		if(selection<numberOfEntries-1)
-			selection ++;
-	}
+  if(value==true)
+    return "on ";
+  else
+    return "off";  
 }
 
-void menuChangeStatusOfSelection(bool patchlist[])
+void Menu::menuChangeSelection(string direction)
 {
-	if(menu[selection].type==SETTING)
-	{
-		patchlist[selection]=!patchlist[selection];
-	}
-}
-
-short getSelectionType()
-{
-  return menu[selection].type;
-}
-
-short getNumberOfPatches()
-{
-  short numberOfPatches = 0;
-  for (int i = 0; i < numberOfEntries; i++)
+  if(direction=="up")
   {
-    if(menu[i].type==SETTING)
-    {
-      numberOfPatches++;
-    }
+    if(this->currentSelection>0)
+      this->currentSelection --;
   }
-  return numberOfPatches;
+  else if(direction=="down")
+  {
+    if(this->currentSelection<numberOfEntries-1)
+      this->currentSelection ++;
+  }
 }
 
-void drowTop()
+void Menu::selectionDoSiteAction()
 {
-  const string title  = "Eshop/Region spoofer by hartie95";
-  const string credit = "based on Ygw eshop spoofer by felipejfc";
-  stringstream usageStream;
-  usageStream << "Usage:\n" << "\n";
-  usageStream << "Start      - Apply patches and exit" << "\n";
-  usageStream << "A          - Use selection" << "\n";
-  usageStream << "Up/Down    - Change selection" << "\n";
-  usageStream << "Left/Right - Modify selection" << "\n";
-  
-  string usage = usageStream.str(); 
-
-  gpuClear(); 
-  gpuViewport(TOP_SCREEN, 0, 0, TOP_WIDTH, TOP_HEIGHT);
-  gputOrtho(0, TOP_WIDTH, 0, TOP_HEIGHT, -1, 1);
-  gpuClearColor(0xFF, 0xFF, 0xFF, 0xFF);  
-  gputDrawString(title, (gpuGetViewportWidth() - gputGetStringWidth(title, 12)) / 2, (gpuGetViewportHeight() - gputGetStringHeight(title, 12))/2+25, 12, 12, 0 , 0 , 0); 
-  gputDrawString(credit, (gpuGetViewportWidth() - gputGetStringWidth(credit, 8)) / 2, (gpuGetViewportHeight() - gputGetStringHeight(credit, 8))/2+12, 8, 8, 0, 0, 0); 
-  gputDrawString(usage, (gpuGetViewportWidth() - gputGetStringWidth(usage, 8)) / 2, (gpuGetViewportHeight() - gputGetStringHeight(usage, 8))/2-75, 8, 8, 0 , 0 , 0); 
-  
-  gpuFlushBuffer();
+  if(this->menuEntrys.at(this->currentSelection).sideAction != nullptr)
+  {
+    (this->menuEntrys.at(this->currentSelection).sideAction)(this->menuEntrys.at(this->currentSelection).name);
+  }
 }
 
-void drawMenu(bool patchlist[])
+Menu* Menu::back()
+{
+  return this->parent;
+}
+
+short Menu::getSelectionType()
+{
+  return menu[this->currentSelection].type;
+}
+
+short Menu::getNumberOfEntrys()
+{
+  return this->menuEntrys.size();
+}
+
+void Menu::drawMenu()
 {
   stringstream menuStream;
-  for(int i = 0; i < numberOfEntries; i++)
+  int i=0;
+  for(std::vector<menuEntry>::iterator it = menuEntrys.begin(); it != menuEntrys.end(); ++it)
   {
-  	if(i==selection)
-  		menuStream << "-> ";
-  	else
-  		menuStream << "   ";
+    /*if(i == this->currentSelection)
+      menuStream << "-> ";
+    else
+      menuStream << "   ";
 
-  	menuStream << menu[i].name;
- 		if(menu[i].type==SETTING)
-  	{
-  		menuStream << "   ";	
-      menuStream << getValueString(patchlist[i]);
-  	}
-  	menuStream << "\n";
+    menuStream << (*it).name;
+     if((*it).type==SETTING)
+    {
+      menuStream << "   ";  
+      menuStream << this->getValueString(true);
+    }
+    menuStream << "\n";
+    i++;*/
   }
-
+/*
   stringstream descriptionStream;
-  descriptionStream << menu[selection].description;
+  descriptionStream << menuEntrys.at(this->currentSelection).description;
   
   string menu = menuStream.str();
   string description = descriptionStream.str();
@@ -109,6 +95,8 @@ void drawMenu(bool patchlist[])
   gpuClearColor(0xFF, 0xFF, 0xFF, 0xFF);
   gputDrawString(menu, (gpuGetViewportWidth() ) / 8, (gpuGetViewportHeight() - gputGetStringHeight(menu, 8))/2 +50 , 8, 8, 0, 0, 0);     
   gputDrawString(description, (gpuGetViewportWidth() - gputGetStringWidth(description, 8)) / 2, (gpuGetViewportHeight() - gputGetStringHeight(description, 8))/2 -75 , 8, 8, 0, 0, 0);     
-
+*/
   gpuFlushBuffer();
+
+  gpuSwapBuffers(true);
 }
