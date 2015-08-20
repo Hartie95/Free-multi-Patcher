@@ -57,6 +57,7 @@ void loadPatchFiles()
               if(tmp!=nullptr)
               {
                   loadedPatches.push_back(new Patch(tmp));
+                  free(tmp);
                   numberOfLoadedPatches++;
               }
           }

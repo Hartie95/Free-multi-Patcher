@@ -78,6 +78,7 @@ private:
 
 public:
     Patch(patch*);
+    ~Patch();
     std::string  getPatchName();
     std::string  getDescription();
     std::string  getProcessName();

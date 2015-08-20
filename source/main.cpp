@@ -16,11 +16,9 @@ using namespace std;
 #define log(...) fprintf(stderr, __VA_ARGS__)
 
 int main(int argc, char **argv) {
-  if(!platformInit()) {
+  if(!platformInit(0)) {
     return 0;
   }
-
-  
 
   //loadSettings(); 
    
@@ -29,7 +27,17 @@ int main(int argc, char **argv) {
   initPatches();
   SaveVersionConstants();
   MenuManager* menu=new MenuManager();
+  Menu* testMenu=new Menu(menu,menu->getMainPage());
+  Menu* testMenu2=new Menu(menu,testMenu);
   
+
+  bool testbool=true;
+  YesNoMenuEntry* testEntryYesNo=new YesNoMenuEntry(&testbool,"testEntryYesNo","This is a testButton\ntestbutton");
+  testMenu->addEntry((MenuEntry*)testEntryYesNo);
+
+  menu->addPage(testMenu,menu->getMainPage(),"testpage");
+  menu->addPage(testMenu2,testMenu,"testpage2");
+
   while(platformIsRunning()&&exitLoop==false) {
     //Todo: replace with switch case
     exitLoop=menu->ManageInput();

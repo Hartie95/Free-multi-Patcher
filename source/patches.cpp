@@ -42,6 +42,11 @@ Patch::Patch(patch *_patch)
     memcpy(patchcode,&(_patch->binaryData[patchCodePosition]),patchcodeSize);
     this->patchCode={patchcodeSize, patchcode};
 }
+Patch::~Patch()
+{
+    free(this->originalCode.code);
+    free(this->patchCode.code);
+}
 
 string Patch::getPatchName()
 {

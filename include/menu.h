@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef MENU_H
+#define MENU_H
+
 #include <3ds.h>
 
 #include <ctrcommon/input.hpp>
@@ -7,49 +10,33 @@
 #include "constants.h"
 #include <stdio.h>
 #include <vector>
+#include <memory>
 
-#define MENU 		0
-#define SETTING 	1
-#define SAVE 		2
-#define PLACEHOLDER 254
-#define EXIT 		255
+#include "defaultMenuEntrys.h"
+//#include "menuManager.h"
 
-#define ESHOPSPOOF		0
-#define REGIONFREE		1
-#define NOAUTODL		2
-#define SERIALCHANGE 	3
+class MenuManager;
 
-typedef struct menuEntryStruct{
-	std::string name;
-	std::string description;
-	int (*sideAction)(std::string);
-	short type;
-}menuEntry;
-
-static const menuEntry menu[]={	
-	{"save",				"Save current selection for later use",nullptr, SAVE},
-	
-};
-
-
-
-static const short numberOfEntries = sizeof(menu)/sizeof(menuEntry);
-class Menu
+class Menu : MenuM
 {
 private:
-	Menu* parent;
-	int currentSelection;
-	//menuEntrys entrys[255];
-	std::string getValueString(bool value);
-	std::vector<menuEntry> menuEntrys;
+	Menu* parentMenu;
+	MenuManager* parentManager;
+	unsigned int currentSelection;
+	std::vector<MenuEntry*> menuEntrys;
 public:
-	Menu();
+	Menu(MenuManager* parentManager,Menu* parentMenu);
+	MenuManager* getParentManager();
+	Menu* getParentMenu();
+	void addEntry(MenuEntry* entry);
+
 	void menuChangeSelection(std::string direction);
-	void menuChangeStatusOfSelection(bool patchlist[]);
-	short getSelectionType();
 	short getNumberOfEntrys();
 	void selectionDoSiteAction();
+	void selectionDoAAction();
 	Menu* back();
 
 	void drawMenu();
 };
+
+#endif

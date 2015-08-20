@@ -9,62 +9,88 @@ using namespace std;
 
 MenuManager::MenuManager()
 {
-	this->mainMenu=new Menu();
+	this->mainPage=new Menu(this,nullptr);
+	this->currentPage=this->mainPage;
+	
+	this->menuPages.push_back(this->mainPage);
+
+	this->exit=false;
 }
 
 bool MenuManager::ManageInput()
 {
 	inputPoll();
-	bool exitValue=false;
 
     if(inputIsPressed(BUTTON_UP))
     {
-      currentPage->menuChangeSelection("up");
+      	currentPage->menuChangeSelection("up");
     }
     else if(inputIsPressed(BUTTON_DOWN))
     {
-      currentPage->menuChangeSelection("down");
+      	currentPage->menuChangeSelection("down");
     }
 
     if(inputIsPressed(BUTTON_LEFT)||inputIsPressed(BUTTON_RIGHT))
     {
-      currentPage->selectionDoSiteAction();
+      	currentPage->selectionDoSiteAction();
     }
 
     if(inputIsPressed(BUTTON_A)) {
-      short selectionType=currentPage->getSelectionType();
-      switch(selectionType)
-      {
-        case SAVE:
-          //saveSettings(patchlist);
-          break;
-        case EXIT:
-        	exitValue = this->setActivePage(this->currentPage->back());
-          break;
-      }      
+        currentPage->selectionDoAAction();
     }
 
     if(inputIsPressed(BUTTON_B)) {
-    	exitValue = true;
+    	this->back();
     }
 
     if(inputIsPressed(BUTTON_START)) {
-      KernelBackdoor(&applyPatches);
-      
-      exitValue = true;
+      	KernelBackdoor(&applyPatches);
+      	this->exit = true;
     }
 
-    return exitValue;
+    return this->exit;
 }
 
-bool MenuManager::setActivePage(Menu* page)
+void MenuManager::back()
+{
+	this->setActivePage(this->currentPage->back());
+}
+
+void MenuManager::navigateTo(MenuM* targetPage)
+{
+	navigateTo((Menu*) targetPage);
+}
+
+void MenuManager::navigateTo(Menu* targetPage)
+{
+	this->currentPage=targetPage;
+}
+
+void MenuManager::addPage(Menu* page, string name)
+{
+	addPage(page,this->mainPage,name);
+}
+
+void MenuManager::addPage(Menu* page, Menu* parent, string name)
+{
+	this->menuPages.push_back(page);
+    NavigationMenuEntry* newPage= new NavigationMenuEntry((MenuManagerM*)this,(MenuM*)page,name,"");
+    parent->addEntry((MenuEntry*)newPage);
+}
+
+void MenuManager::setActivePage(Menu* page)
 {
 	if(page==nullptr)
-		return true;
+		this->exit=true;
 	else
 		this->currentPage=page;
-	return false;
 }
+
+Menu* MenuManager::getMainPage()
+{
+	return this->mainPage;
+}
+
 
 void MenuManager::drawMenu()
 {
