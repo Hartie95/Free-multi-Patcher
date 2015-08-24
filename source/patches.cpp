@@ -230,8 +230,8 @@ void createDefaultPatches()
     menuPatch->nandCompability      = {1,1,0};
     menuPatch->patchType            = 0x00;
     menuPatch->startAddressProcess  = 0x00100000;
-    menuPatch->startAddressGlobal   = 0x26A00000;
-    menuPatch->searchAreaSize       = 0x00100000;
+    menuPatch->startAddressGlobal   = 0x26960000;
+    menuPatch->searchAreaSize       = 0x001A0000;
     menuPatch->numberOfReplacements = 0x01;
 
     memcpy(menuPatch->binaryData, menuBytes, sizeof(menuBytes));
