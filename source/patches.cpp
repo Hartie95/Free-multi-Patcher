@@ -11,7 +11,7 @@ using namespace std;
 
     
 
-Patch::Patch(patch *_patch)
+Patch::Patch(binPatch *_patch)
 {
     u32 processNamePosition=_patch->patchNameSize+_patch->descriptionSize;
 
@@ -41,6 +41,8 @@ Patch::Patch(patch *_patch)
     u32 patchCodePosition=originalCodePosition+originalcodeSize;
     memcpy(patchcode,&(_patch->binaryData[patchCodePosition]),patchcodeSize);
     this->patchCode={patchcodeSize, patchcode};
+
+    this->changeStatus(true);
 }
 Patch::~Patch()
 {
@@ -118,6 +120,24 @@ code   Patch::getOriginalCode()
 code   Patch::getPatchCode()
 {
     return this->patchCode;
+}
+
+
+
+bool    Patch::changeStatus()
+{
+    return this->changeStatus(!this->enabled);
+}
+
+bool    Patch::changeStatus(bool status)
+{
+    this->enabled=status;
+    return this->enabled;
+}
+
+bool    Patch::isEnabled()
+{
+    return this->enabled;
 }
 
 
@@ -215,7 +235,7 @@ void createDefaultPatches()
                     /*OriginalCode*/"\x00\x00\x55\xE3\x01\x10\xA0\xE3\x11\x00\xA0\xE1\x03\x00\x00\x0A" 
                     /*patchBegin*/  "\x01\x00\xA0\xE3\x70\x80\xBD\xE8";
 
-    patch* menuPatch=(patch*)malloc(sizeof(patch)+sizeof(menuBytes));
+    binPatch* menuPatch=(binPatch*)malloc(sizeof(binPatch)+sizeof(menuBytes));
     
     menuPatch->version              = 0x00;
     menuPatch->patchNameSize        = 17;
@@ -244,7 +264,7 @@ void createDefaultPatches()
     {
         file = fopen(filepath.c_str(),"c"); 
     }
-    fwrite(menuPatch,1,(sizeof(patch)+sizeof(menuBytes)),file);
+    fwrite(menuPatch,1,(sizeof(binPatch)+sizeof(menuBytes)),file);
     fclose(file);
     free(menuPatch);
 
@@ -256,7 +276,7 @@ void createDefaultPatches()
                     /*OriginalCode*/"\x0C\x18\xE1\xD8" 
                     /*patchBegin*/  "\x0B\x18\x21\xC8";
 
-    patch* nsPatch=(patch*)malloc(sizeof(patch)+sizeof(nsBytes));
+    binPatch* nsPatch=(binPatch*)malloc(sizeof(binPatch)+sizeof(nsBytes));
     
     nsPatch->version              = 0x00;
     nsPatch->patchNameSize        = 17;
@@ -285,7 +305,7 @@ void createDefaultPatches()
     {
         file = fopen(filepath.c_str(),"c"); 
     }
-    fwrite(nsPatch,1,(sizeof(patch)+sizeof(nsBytes)),file);
+    fwrite(nsPatch,1,(sizeof(binPatch)+sizeof(nsBytes)),file);
     fclose(file);
     free(nsPatch);
 
@@ -298,7 +318,7 @@ void createDefaultPatches()
                             /*OriginalCode*/"\x35\x22\x10\xB5\xD2\x01\x80\x18\x00\x79\x00\x28\x03\xD0\x08\x46" 
                             /*patchBegin*/  "\x00\x20\x08\x60\x70\x47";
 
-    patch* nimSpoofPatch=(patch*)malloc(sizeof(patch)+sizeof(nimSpoofBytes));
+    binPatch* nimSpoofPatch=(binPatch*)malloc(sizeof(binPatch)+sizeof(nimSpoofBytes));
     
     nimSpoofPatch->version              = 0x00;
     nimSpoofPatch->patchNameSize        = 12;
@@ -327,7 +347,7 @@ void createDefaultPatches()
     {
         file = fopen(filepath.c_str(),"c"); 
     }
-    fwrite(nimSpoofPatch,1,(sizeof(patch)+sizeof(nimSpoofBytes)),file);
+    fwrite(nimSpoofPatch,1,(sizeof(binPatch)+sizeof(nimSpoofBytes)),file);
     fclose(file);
     free(nimSpoofPatch);
 
@@ -340,7 +360,7 @@ void createDefaultPatches()
                             /*OriginalCode*/"\x25\x79\x0B\x99\x00\x24\x00\x2D\x29\xD0\x16\x4D\x2D\x68\x01\x91" 
                             /*patchBegin*/  "\xE3\xA0\x00\x00";
 
-    patch* nimUpdatePatch=(patch*)malloc(sizeof(patch)+sizeof(nimUpdateBytes));
+    binPatch* nimUpdatePatch=(binPatch*)malloc(sizeof(binPatch)+sizeof(nimUpdateBytes));
     
     nimUpdatePatch->version              = 0x00;
     nimUpdatePatch->patchNameSize        = 16;
@@ -369,7 +389,7 @@ void createDefaultPatches()
     {
         file = fopen(filepath.c_str(),"c"); 
     }
-    fwrite(nimUpdatePatch,1,(sizeof(patch)+sizeof(nimUpdateBytes)),file);
+    fwrite(nimUpdatePatch,1,(sizeof(binPatch)+sizeof(nimUpdateBytes)),file);
     fclose(file);
     free(nimUpdatePatch);
 

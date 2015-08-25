@@ -11,6 +11,8 @@
 #include "kernel11.h"
 #include "kobjects.h"
 
+#include "patchEntry.h"
+
 
 using namespace std;
 
@@ -52,7 +54,7 @@ void loadPatchFiles()
           {
               string filepath=patchesFolder+currenElement->d_name;
               FILE* file = fopen(filepath.c_str(),"rb");  
-              patch* tmp=loadPatch(file);
+              binPatch* tmp=loadPatch(file);
 
               if(tmp!=nullptr)
               {
@@ -66,6 +68,23 @@ void loadPatchFiles()
   closedir(dir);
 }
 
+int createPatchPage(MenuManager* menuManager)
+{
+  Menu* page=new Menu(menuManager,menuManager->getMainPage());
+
+  Patch* currentPatch;
+  for(std::vector<Patch*>::iterator it = loadedPatches.begin(); it != loadedPatches.end(); ++it)
+  {
+    currentPatch = (*it);
+    PatchEntry* entry=new PatchEntry(currentPatch);
+    page->addEntry((MenuEntry*)entry);
+  }  
+    
+  menuManager->addPage(page,page->getParentMenu(),"Manage Patches");
+  return 0;
+}
+
+
 bool isPatch(struct dirent* file)
 {
     u32 nameLength=strlen(file->d_name);
@@ -76,16 +95,16 @@ bool isPatch(struct dirent* file)
     return false;
 }
 
-patch* loadPatch(FILE* file)
+binPatch* loadPatch(FILE* file)
 {
-    patch* loadedPatch=nullptr;
+    binPatch* loadedPatch=nullptr;
     if(file != NULL)
     {    
         fseek(file, 0L, SEEK_END);
         u32 fileSize = ftell(file);
         fseek(file, 0L, SEEK_SET);
 
-        loadedPatch=(patch*)malloc(fileSize);
+        loadedPatch=(binPatch*)malloc(fileSize);
         if(loadedPatch!=nullptr)
         {
             fread(loadedPatch,1,fileSize,file);
@@ -98,15 +117,13 @@ patch* loadPatch(FILE* file)
 int applyPatches(){
 
   //PatchSrvAccess();  
+  Patch* currentPatch;
   for(std::vector<Patch*>::iterator it = loadedPatches.begin(); it != loadedPatches.end(); ++it)
   {
-    findAndReplaceCode(*it);
+    currentPatch = (*it);
+    if(currentPatch->isEnabled())
+      findAndReplaceCode(currentPatch);
   }
-  
-  /*for(u32 i = 0; i<numberOfLoadedPatches;i++)
-  {
-    findAndReplaceCode(loadedPatches[i]);
-  }*/
 
   return 0;
 }

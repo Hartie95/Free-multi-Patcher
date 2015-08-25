@@ -30,6 +30,7 @@ int main(int argc, char **argv) {
   Menu* testMenu=new Menu(menu,menu->getMainPage());
   Menu* testMenu2=new Menu(menu,testMenu);
   
+  createPatchPage(menu);
 
   bool testbool=true;
   YesNoMenuEntry* testEntryYesNo=new YesNoMenuEntry(&testbool,"testEntryYesNo","This is a testButton\ntestbutton");

@@ -48,13 +48,13 @@ typedef struct patchStruct
     u32     maxKernelVersion;
     regions regionsSupported;
     nands   nandCompability;
-    u8   patchType;
+    u8      patchType;
     u32     startAddressProcess;
     u32     startAddressGlobal;
     u32     searchAreaSize;
     u32     numberOfReplacements;
     char binaryData[];
-} patch;
+} binPatch;
 
 class Patch
 {
@@ -69,15 +69,17 @@ private:
     nands   nandCompability;
 
     u8      patchType;
-    u32   startAddressProcess;
-    u32   startAddressGlobal;
+    u32     startAddressProcess;
+    u32     startAddressGlobal;
     u32     searchAreaSize;
     u32     numberOfReplacements;
-    code   originalCode;
-    code   patchCode;
+    code    originalCode;
+    code    patchCode;
+
+    bool    enabled;
 
 public:
-    Patch(patch*);
+    Patch(binPatch*);
     ~Patch();
     std::string  getPatchName();
     std::string  getDescription();
@@ -93,6 +95,10 @@ public:
     u32     getStartAddressGlobal();
     u32     getSearchAreaSize();
     u32     getNumberOfReplacements();
-    code     getOriginalCode();
-    code     getPatchCode();
+    code    getOriginalCode();
+    code    getPatchCode();
+
+    bool    changeStatus();
+    bool    changeStatus(bool status);
+    bool    isEnabled();
 };

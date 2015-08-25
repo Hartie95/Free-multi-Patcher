@@ -25,11 +25,13 @@ public:
 	virtual int sideAction();
 	virtual int aAction();
 	virtual std::string getRow();
+	void setName(std::string name);
+	void setDescription(std::string description);
 	std::string getName();
 	std::string getDescription();
 };
 
-class BackMenuEntry : MenuEntry 
+class BackMenuEntry : protected MenuEntry 
 {
 private:
 	MenuManagerM* manager;
@@ -39,7 +41,7 @@ public:
 	void back();
 };
 
-class NavigationMenuEntry : MenuEntry 
+class NavigationMenuEntry : protected MenuEntry 
 {
 private:
 	MenuM* 		  menu;
@@ -50,14 +52,17 @@ public:
 	void navigate();
 };
 
-class YesNoMenuEntry : MenuEntry 
+class YesNoMenuEntry : protected MenuEntry 
 {
 private:
 protected:
 	bool* value;
 	std::string getValueString(bool value);
+	YesNoMenuEntry(){
+
+	}
 public:
 	YesNoMenuEntry(bool* value,std::string name, std::string description);
-	int sideAction();
-	std::string getRow();
+	virtual int sideAction();
+	virtual std::string getRow();
 };

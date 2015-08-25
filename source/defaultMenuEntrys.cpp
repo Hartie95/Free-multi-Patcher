@@ -17,6 +17,15 @@ int MenuEntry::aAction()
 {
 	return 0;
 }
+void MenuEntry::setName(string name)
+{
+	this->name=name;
+}
+void MenuEntry::setDescription(string description)
+{
+	this->description=description;
+}
+
 
 string MenuEntry::getName() 
 {
@@ -108,5 +117,4 @@ string YesNoMenuEntry::getRow()
 	returnString+="  "+getValueString(*this->value);
 	return returnString;
 	//this->name;
-
 }
