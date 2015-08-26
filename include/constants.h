@@ -11,6 +11,7 @@ static const std::string patchesFolder = applicationFolder+"patches/";
 static const std::string patchExtension =".patch";
 static const std::string settingsFolder=applicationFolder;
 static const std::string settingsFileName="settings.cfg";
+static const u32 version=0x006010;
 
 extern u32 curr_kproc_addr;
 extern u32 kproc_start;
