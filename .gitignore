@@ -1,3 +1,13 @@
 output
 build
 *.cia
+# ignore visual studio project files
+*.opensdf
+*.sdf
+*.sln
+*.suo
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+*.log

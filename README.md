@@ -1,7 +1,8 @@
 Free multi Patcher
 ==================================
 
-This application for the 3DS allows to patch systemmodules while using system or emunand,and with and without using firmlaunch. Because of this it allows E-Shop access on all 9.x firmware verions and regionfree cias in Pasta and other CFWs
+This application for the 3DS allows to patch systemmodules while using system or emunand and with and without using firmlaunch. Because of this it allows E-Shop access on all 9.x firmware verions and regionfree in Pasta and other CFWs.
+It also allows other peoples to create, add and share own patches using the patchlayout defined by this [wiki page](https://github.com/hartmannaf/Free-multi-Patcher/wiki/patchlayout)
 
 ### Dependencies
 

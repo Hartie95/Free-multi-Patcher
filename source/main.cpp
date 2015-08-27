@@ -17,13 +17,13 @@ using namespace std;
 
 int checkVersion()
 {
-    httpcInit();
     int onlineVersion=version;
-
     httpcContext context;
     Result ret=0;
     u32 statuscode=0;
     char url[] = "http://fmp.hartie95.de/version.txt"; 
+
+    httpcInit();
 
     ret = httpcOpenContext(&context, url , 0); 
     if(ret==0)
