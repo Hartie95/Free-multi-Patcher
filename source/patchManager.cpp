@@ -118,11 +118,15 @@ int applyPatches(){
 
   //PatchSrvAccess();  
   Patch* currentPatch;
+  bool ignoreKernelVersion=false;
   for(std::vector<Patch*>::iterator it = loadedPatches.begin(); it != loadedPatches.end(); ++it)
   {
     currentPatch = (*it);
     if(currentPatch->isEnabled())
-      findAndReplaceCode(currentPatch);
+        if (checkKernelVersion(currentPatch->getMinKernelVersion(), currentPatch->getMaxKernelVersion()) || ignoreKernelVersion)
+        {
+            findAndReplaceCode(currentPatch);
+        }
   }
 
   return 0;
@@ -193,4 +197,38 @@ int findAndReplaceCode(Patch* _patch)
         }  
     }  
     return 0;
+}
+
+bool checkKernelVersion(kernelVersion min, kernelVersion max)
+{
+    u32 kernelValue = osGetKernelVersion();
+    bool minBool = false;
+    bool maxBool = false;
+    kernelVersion* kernel = (kernelVersion*)&kernelValue;
+    if (min.major < kernel->major)
+        minBool = true;
+    else if (min.major == kernel->major)
+    {
+        if (min.minor < kernel->minor)
+            minBool = true;
+        else if (min.minor == kernel->minor)
+        {
+            if (min.revision <= kernel->revision)
+                minBool = true;
+        }
+    }
+    if (max.major > kernel->major)
+        maxBool = true;
+    else if (max.major == kernel->major)
+    {
+        if (max.minor > kernel->minor)
+            minBool = true;
+        else if (max.minor == kernel->minor)
+        {
+            if (max.revision >= kernel->revision)
+                minBool = true;
+        }
+
+    }
+    return (minBool && maxBool);
 }

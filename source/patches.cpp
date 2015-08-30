@@ -4,7 +4,6 @@
 //#include <sys/stat.h>
 #include <stdlib.h>
 
-#include "constants.h"
 #include "patches.h"
 
 using namespace std;
@@ -66,12 +65,12 @@ string Patch::getProcessName()
 }
 
 
-u32 Patch::getMinKernelVersion()
+kernelVersion Patch::getMinKernelVersion()
 {
     return this->minKernelVersion;
 }
 
-u32 Patch::getMaxKernelVersion()
+kernelVersion Patch::getMaxKernelVersion()
 {
     return this->maxKernelVersion;
 }
@@ -244,8 +243,8 @@ void createDefaultPatches()
     menuPatch->originalcodeSize     = 16;
     menuPatch->patchcodeSize        = 8;
     menuPatch->processType          = 0x01;
-    menuPatch->minKernelVersion     = 0x0;
-    menuPatch->maxKernelVersion     = 0x0;
+    menuPatch->minKernelVersion     = {0x00, 0x00, 0x00, 0x00};
+    menuPatch->maxKernelVersion     = {0xFF, 0xFF, 0xFF, 0xFF};
     menuPatch->regionsSupported     = {1,1,1,1,1,1,1,0};
     menuPatch->nandCompability      = {1,1,0};
     menuPatch->patchType            = 0x00;
@@ -285,8 +284,8 @@ void createDefaultPatches()
     nsPatch->originalcodeSize     = 4;
     nsPatch->patchcodeSize        = 4;
     nsPatch->processType          = 0x01;
-    nsPatch->minKernelVersion     = 0x0;
-    nsPatch->maxKernelVersion     = 0x0;
+    nsPatch->minKernelVersion     = { 0x00, 0x00, 0x00, 0x00 };
+    nsPatch->maxKernelVersion     = { 0xFF, 0xFF, 0xFF, 0xFF };
     nsPatch->regionsSupported     = {1,1,1,1,1,1,1,0};
     nsPatch->nandCompability      = {1,1,0};
     nsPatch->patchType            = 0x00;
@@ -327,8 +326,8 @@ void createDefaultPatches()
     nimSpoofPatch->originalcodeSize     = 16;
     nimSpoofPatch->patchcodeSize        = 6;
     nimSpoofPatch->processType          = 0x01;
-    nimSpoofPatch->minKernelVersion     = 0x0;
-    nimSpoofPatch->maxKernelVersion     = 0xFFFFFFFF;
+    nimSpoofPatch->minKernelVersion     = { 0x00, 0x00, 0x00, 0x00 };
+    nimSpoofPatch->maxKernelVersion     = { 0xFF, 0xFF, 0xFF, 0xFF };
     nimSpoofPatch->regionsSupported     = {1,1,1,1,1,1,1,0};
     nimSpoofPatch->nandCompability      = {1,1,0};
     nimSpoofPatch->patchType            = 0x00;
@@ -369,8 +368,8 @@ void createDefaultPatches()
     nimUpdatePatch->originalcodeSize     = 16;
     nimUpdatePatch->patchcodeSize        = 4;
     nimUpdatePatch->processType          = 0x01;
-    nimUpdatePatch->minKernelVersion     = 0x0;
-    nimUpdatePatch->maxKernelVersion     = 0xFFFFFFFF;
+    nimUpdatePatch->minKernelVersion     = { 0x00, 0x00, 0x00, 0x00 };
+    nimUpdatePatch->maxKernelVersion     = { 0xFF, 0xFF, 0xFF, 0xFF };
     nimUpdatePatch->regionsSupported     = {1,1,1,1,1,1,1,0};
     nimUpdatePatch->nandCompability      = {1,1,0};
     nimUpdatePatch->patchType            = 0x00;

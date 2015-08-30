@@ -106,7 +106,7 @@ int YesNoMenuEntry::sideAction()
 
 string YesNoMenuEntry::getRow()
 {
-	int nameLength=15;
+	int nameLength=20;
 	int length=this->name.size();
 	string returnString=this->name;
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <3ds.h>
+#include "constants.h"
 
 /*int PatchPid();
 int UnpatchPid();
@@ -44,8 +45,8 @@ typedef struct patchStruct
     u32   originalcodeSize;
     u32   patchcodeSize;
     u32   processType;
-    u32     minKernelVersion;
-    u32     maxKernelVersion;
+    kernelVersion     minKernelVersion;
+    kernelVersion     maxKernelVersion;
     regions regionsSupported;
     nands   nandCompability;
     u8      patchType;
@@ -63,8 +64,8 @@ private:
     std::string  description;
     std::string  processName;
 
-    u32     minKernelVersion;
-    u32     maxKernelVersion;
+    kernelVersion     minKernelVersion;
+    kernelVersion     maxKernelVersion;
     regions regionsSupported;
     nands   nandCompability;
 
@@ -85,8 +86,8 @@ public:
     std::string  getDescription();
     std::string  getProcessName();
 
-    u32     getMinKernelVersion();
-    u32     getMaxKernelVersion();
+    kernelVersion     getMinKernelVersion();
+    kernelVersion     getMaxKernelVersion();
     regions getRegionsSupported();
     nands   getNandCompability();
 

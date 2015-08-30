@@ -12,6 +12,7 @@
 #include "menu.h"
 #include "patchManager.h"
 #include "menuManager.h"
+#include <sstream>
 
 using namespace std;
 
@@ -85,7 +86,6 @@ int checkForUpdate()
     return onlineVersion;
 }
 
-#define log(...) fprintf(stderr, __VA_ARGS__)
 
 int main(int argc, char **argv) {
   if(!platformInit(argc)) {
@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
   //loadSettings(); 
    
   short exitLoop=false;
-
+  initCfgu();
   initPatches();
   SaveVersionConstants();
   MenuManager* menu=new MenuManager();
@@ -127,6 +127,7 @@ int main(int argc, char **argv) {
   }
 
   HB_FlushInvalidateCache(); // Just to be sure!
+  exitCfgu();
   platformCleanup();
   return 0;  
 }
