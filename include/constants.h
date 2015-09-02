@@ -22,6 +22,14 @@ typedef struct kernelVersionStruct
     u8 major;
 }kernelVersion;
 
+typedef struct firmwareVersionStruct
+{
+    u8 major;
+    u8 minor;
+    u8 revision;
+    u8 nver;
+}firmwareVersion;
+
 extern u32 curr_kproc_addr;
 extern u32 kproc_start;
 extern u32 kproc_size;

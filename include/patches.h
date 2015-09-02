@@ -47,6 +47,8 @@ typedef struct patchStruct
     u32   processType;
     kernelVersion     minKernelVersion;
     kernelVersion     maxKernelVersion;
+    firmwareVersion     minFirmwareVersion;
+    firmwareVersion     maxFirmwareVersion;
     regions regionsSupported;
     nands   nandCompability;
     u8      patchType;
@@ -66,6 +68,8 @@ private:
 
     kernelVersion     minKernelVersion;
     kernelVersion     maxKernelVersion;
+    firmwareVersion   minFirmwareVersion;
+    firmwareVersion   maxFirmwareVersion;
     regions regionsSupported;
     nands   nandCompability;
 

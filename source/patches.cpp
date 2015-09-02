@@ -20,6 +20,8 @@ Patch::Patch(binPatch *_patch)
 
     this->minKernelVersion = _patch->minKernelVersion;
     this->maxKernelVersion = _patch->maxKernelVersion;
+    this->minFirmwareVersion = _patch->minFirmwareVersion;
+    this->maxFirmwareVersion = _patch->maxFirmwareVersion;
     this->regionsSupported = _patch->regionsSupported;
     this->nandCompability = _patch->nandCompability;
 
@@ -245,6 +247,8 @@ void createDefaultPatches()
     menuPatch->processType          = 0x01;
     menuPatch->minKernelVersion     = {0x00, 0x00, 0x00, 0x00};
     menuPatch->maxKernelVersion     = {0xFF, 0xFF, 0xFF, 0xFF};
+    menuPatch->minFirmwareVersion   = { 4, 0, 0, 0 };
+    menuPatch->maxFirmwareVersion   = { 9, 9, 0, 255 };
     menuPatch->regionsSupported     = {1,1,1,1,1,1,1,0};
     menuPatch->nandCompability      = {1,1,0};
     menuPatch->patchType            = 0x00;
@@ -284,8 +288,10 @@ void createDefaultPatches()
     nsPatch->originalcodeSize     = 4;
     nsPatch->patchcodeSize        = 4;
     nsPatch->processType          = 0x01;
-    nsPatch->minKernelVersion     = { 0x00, 0x00, 0x00, 0x00 };
-    nsPatch->maxKernelVersion     = { 0xFF, 0xFF, 0xFF, 0xFF };
+    nsPatch->minKernelVersion     = { 0, 4, 33, 2 };
+    nsPatch->maxKernelVersion     = { 255, 1, 50, 2 };
+    nsPatch->minFirmwareVersion   = {0x00, 0x00, 0x00, 0x00};
+    nsPatch->maxFirmwareVersion   = {0xFF, 0xFF, 0xFF, 0xFF};
     nsPatch->regionsSupported     = {1,1,1,1,1,1,1,0};
     nsPatch->nandCompability      = {1,1,0};
     nsPatch->patchType            = 0x00;
@@ -326,8 +332,10 @@ void createDefaultPatches()
     nimSpoofPatch->originalcodeSize     = 16;
     nimSpoofPatch->patchcodeSize        = 6;
     nimSpoofPatch->processType          = 0x01;
-    nimSpoofPatch->minKernelVersion     = { 0x00, 0x00, 0x00, 0x00 };
-    nimSpoofPatch->maxKernelVersion     = { 0xFF, 0xFF, 0xFF, 0xFF };
+    nimSpoofPatch->minKernelVersion     = {0x00, 0x00, 0x00, 0x00};
+    nimSpoofPatch->maxKernelVersion     = {0xFF, 0xFF, 0xFF, 0xFF};
+    menuPatch->minFirmwareVersion       = { 9, 0, 0, 20 };
+    menuPatch->maxFirmwareVersion       = { 9, 9, 0, 26 };
     nimSpoofPatch->regionsSupported     = {1,1,1,1,1,1,1,0};
     nimSpoofPatch->nandCompability      = {1,1,0};
     nimSpoofPatch->patchType            = 0x00;
@@ -368,8 +376,10 @@ void createDefaultPatches()
     nimUpdatePatch->originalcodeSize     = 16;
     nimUpdatePatch->patchcodeSize        = 4;
     nimUpdatePatch->processType          = 0x01;
-    nimUpdatePatch->minKernelVersion     = { 0x00, 0x00, 0x00, 0x00 };
-    nimUpdatePatch->maxKernelVersion     = { 0xFF, 0xFF, 0xFF, 0xFF };
+    nimUpdatePatch->minKernelVersion     = {0x00, 0x00, 0x00, 0x00};
+    nimUpdatePatch->maxKernelVersion     = {0xFF, 0xFF, 0xFF, 0xFF};
+    menuPatch->minFirmwareVersion        = { 4, 0, 0, 0 };
+    menuPatch->maxFirmwareVersion        = { 9, 9, 0, 255 };
     nimUpdatePatch->regionsSupported     = {1,1,1,1,1,1,1,0};
     nimUpdatePatch->nandCompability      = {1,1,0};
     nimUpdatePatch->patchType            = 0x00;
