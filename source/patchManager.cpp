@@ -177,7 +177,7 @@ int applyPatches(){
 
   //PatchSrvAccess();  
   Patch* currentPatch;
-  bool ignoreKernelVersion=true;
+  bool ignoreKernelVersion=false;
   for(std::vector<Patch*>::iterator it = loadedPatches.begin(); it != loadedPatches.end(); ++it)
   {
     currentPatch = (*it);
@@ -299,11 +299,11 @@ bool checkKernelVersion(kernelVersion min, kernelVersion max)
     else if (max.major == kernel->major)
     {
         if (max.minor > kernel->minor)
-            minBool = true;
+            maxBool = true;
         else if (max.minor == kernel->minor)
         {
             if (max.revision >= kernel->revision)
-                minBool = true;
+                maxBool = true;
         }
 
     }
