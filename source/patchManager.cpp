@@ -17,13 +17,16 @@
 using namespace std;
 
 vector<Patch*> loadedPatches;
+vector<PatchCollection*> loadedCollections;
 u32 numberOfLoadedPatches;
+u32 numberOfLoadedCollections;
 string enabledPatches[10];
 
 void initPatches()
 {
     checkPatchFolder();
     createDefaultPatches();
+    createDefaultCollections();
     loadPatchFiles();
 }
 
@@ -37,35 +40,51 @@ void loadPatchFiles()
 {  
 
 
-  DIR *dir;
-  dir = opendir(patchesFolder.c_str());
-  if (dir)
-  {
-      //u32 numberOfPatchFiles=getNumberOfPatchFiles(dir);
-      //loadedPatches=(patch** )malloc(numberOfPatchFiles*sizeof(patch *));
+    DIR *dir;
+    dir = opendir(patchesFolder.c_str());
+    if (dir)
+    {
+        //u32 numberOfPatchFiles=getNumberOfPatchFiles(dir);
+        //loadedPatches=(patch** )malloc(numberOfPatchFiles*sizeof(patch *));
 
-      closedir(dir);
-      dir = opendir(patchesFolder.c_str());
-      numberOfLoadedPatches=0;
-      struct dirent *currenElement;
-      while ((currenElement = readdir(dir)) != NULL)
-      {
-          if(isPatch(currenElement))
-          {
-              string filepath=patchesFolder+currenElement->d_name;
-              FILE* file = fopen(filepath.c_str(),"rb");  
-              binPatch* tmp=loadPatch(file);
+        closedir(dir);
+        dir = opendir(patchesFolder.c_str());
+        numberOfLoadedPatches=0;
+        numberOfLoadedCollections = 0;
+        struct dirent *currenElement;
+        while ((currenElement = readdir(dir)) != NULL)
+        {
+            if(isPatch(currenElement))
+            {
+                string filepath=patchesFolder+currenElement->d_name;
+                FILE* file = fopen(filepath.c_str(),"rb");  
+                binPatch* tmp=loadPatch(file);
 
-              if(tmp!=nullptr)
-              {
-                  loadedPatches.push_back(new Patch(tmp));
-                  free(tmp);
-                  numberOfLoadedPatches++;
-              }
-          }
-      }
-  }
-  closedir(dir);
+                if(tmp!=nullptr)
+                {
+                    loadedPatches.push_back(new Patch(tmp));
+                    free(tmp);
+                    numberOfLoadedPatches++;
+                }
+            }
+            else  if(isCollection(currenElement))
+            {
+                string filepath = patchesFolder + currenElement->d_name;
+                FILE* file = fopen(filepath.c_str(), "rb");
+                binPatchCollection* tmp = loadCollection(file);
+
+                if (tmp != nullptr)
+                {
+                    PatchCollection* tmpCollection = new PatchCollection(tmp);
+                    
+                    loadedCollections.push_back(tmpCollection);
+                    free(tmp);
+                    numberOfLoadedCollections++;
+                }
+            }
+        }
+    }
+    closedir(dir);
 }
 
 int createPatchPage(MenuManager* menuManager)
@@ -95,6 +114,21 @@ bool isPatch(struct dirent* file)
     return false;
 }
 
+bool isCollection(struct dirent* file)
+{
+    u32 nameLength = strlen(file->d_name);
+    if (nameLength >= patchCollectionExtension.size())
+    {
+        u32 extensionStart = nameLength - patchCollectionExtension.size();
+        if (strcmp(file->d_name + extensionStart, patchCollectionExtension.c_str()) == 0)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 binPatch* loadPatch(FILE* file)
 {
     binPatch* loadedPatch=nullptr;
@@ -103,6 +137,9 @@ binPatch* loadPatch(FILE* file)
         fseek(file, 0L, SEEK_END);
         u32 fileSize = ftell(file);
         fseek(file, 0L, SEEK_SET);
+
+        if (fileSize < sizeof(binPatch))
+            return nullptr;
 
         loadedPatch=(binPatch*)malloc(fileSize);
         if(loadedPatch!=nullptr)
@@ -114,11 +151,33 @@ binPatch* loadPatch(FILE* file)
     return loadedPatch;
 }
 
+binPatchCollection* loadCollection(FILE* file)
+{
+    binPatchCollection* loadedPatch = nullptr;
+    if (file != NULL)
+    {
+        fseek(file, 0L, SEEK_END);
+        u32 fileSize = ftell(file);
+        fseek(file, 0L, SEEK_SET);
+
+        if (fileSize < (sizeof(binPatch)+sizeof(binPatchCollection)))
+            return nullptr;
+
+        loadedPatch = (binPatchCollection*)malloc(fileSize);
+        if (loadedPatch != nullptr)
+        {
+            fread(loadedPatch, 1, fileSize, file);
+        }
+        fclose(file);
+    }
+    return loadedPatch;
+}
+
 int applyPatches(){
 
   //PatchSrvAccess();  
   Patch* currentPatch;
-  bool ignoreKernelVersion=false;
+  bool ignoreKernelVersion=true;
   for(std::vector<Patch*>::iterator it = loadedPatches.begin(); it != loadedPatches.end(); ++it)
   {
     currentPatch = (*it);
@@ -127,6 +186,24 @@ int applyPatches(){
         {
             findAndReplaceCode(currentPatch);
         }
+  }
+  PatchCollection* currentCollection;
+  for (std::vector<PatchCollection*>::iterator it = loadedCollections.begin(); it != loadedCollections.end(); ++it)
+  {
+      currentCollection = (*it);
+      if (currentCollection->isEnabled())
+      {
+          vector<Patch*>* collectionPatches = currentCollection->getAllPatches();
+          for (std::vector<Patch*>::iterator it = collectionPatches->begin(); it != collectionPatches->end(); ++it)
+          {
+              currentPatch = (*it);
+              if (currentPatch->isEnabled())
+                  if (checkKernelVersion(currentPatch->getMinKernelVersion(), currentPatch->getMaxKernelVersion()) || ignoreKernelVersion)
+                  {
+                      findAndReplaceCode(currentPatch);
+                  }
+          }
+      }
   }
 
   return 0;

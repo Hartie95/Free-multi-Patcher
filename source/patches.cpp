@@ -262,13 +262,13 @@ void createDefaultPatches()
     string menuPatchFileName="regionMenu"+patchExtension;
 
     string filepath=patchesFolder+menuPatchFileName;
-    file = fopen(filepath.c_str(),"w"); 
+    /*file = fopen(filepath.c_str(),"w"); 
     if (file == NULL) 
     {
         file = fopen(filepath.c_str(),"c"); 
     }
-    fwrite(menuPatch,1,(sizeof(binPatch)+sizeof(menuBytes)),file);
-    fclose(file);
+    //fwrite(menuPatch,1,(sizeof(binPatch)+sizeof(menuBytes)),file);
+    fclose(file);*/
     free(menuPatch);
 
     // patch NS to return update doesnt need to be installed intead of CVer not found error code after Update Check
@@ -305,13 +305,13 @@ void createDefaultPatches()
     string nsPatchFileName="regionNs"+patchExtension;
 
     filepath=patchesFolder+nsPatchFileName;
-    file = fopen(filepath.c_str(),"w"); 
+    /*file = fopen(filepath.c_str(),"w"); 
     if (file == NULL) 
     {
         file = fopen(filepath.c_str(),"c"); 
     }
-    fwrite(nsPatch,1,(sizeof(binPatch)+sizeof(nsBytes)),file);
-    fclose(file);
+    //fwrite(nsPatch,1,(sizeof(binPatch)+sizeof(nsBytes)),file);
+    fclose(file);*/
     free(nsPatch);
 
 
@@ -323,9 +323,11 @@ void createDefaultPatches()
                             /*OriginalCode*/"\x35\x22\x10\xB5\xD2\x01\x80\x18\x00\x79\x00\x28\x03\xD0\x08\x46" 
                             /*patchBegin*/  "\x00\x20\x08\x60\x70\x47";
 
-    binPatch* nimSpoofPatch=(binPatch*)malloc(sizeof(binPatch)+sizeof(nimSpoofBytes));
+    u32 nimSpoofSize = sizeof(binPatch) + sizeof(nimSpoofBytes);
+    binPatch* nimSpoofPatch = (binPatch*)malloc(nimSpoofSize);
     
     nimSpoofPatch->version              = 0x00;
+    nimSpoofPatch->patchSize            = nimSpoofSize;
     nimSpoofPatch->patchNameSize        = 12;
     nimSpoofPatch->descriptionSize      = 29;
     nimSpoofPatch->processNameSize      = 3;
@@ -354,7 +356,7 @@ void createDefaultPatches()
     {
         file = fopen(filepath.c_str(),"c"); 
     }
-    fwrite(nimSpoofPatch,1,(sizeof(binPatch)+sizeof(nimSpoofBytes)),file);
+    fwrite(nimSpoofPatch, 1, (nimSpoofSize), file);
     fclose(file);
     free(nimSpoofPatch);
 
@@ -367,9 +369,11 @@ void createDefaultPatches()
                             /*OriginalCode*/"\x25\x79\x0B\x99\x00\x24\x00\x2D\x29\xD0\x16\x4D\x2D\x68\x01\x91" 
                             /*patchBegin*/  "\xE3\xA0\x00\x00";
 
-    binPatch* nimUpdatePatch=(binPatch*)malloc(sizeof(binPatch)+sizeof(nimUpdateBytes));
+    u32 nimUpdateSize = sizeof(binPatch) + sizeof(nimUpdateBytes);
+    binPatch* nimUpdatePatch = (binPatch*)malloc(nimUpdateSize);
     
     nimUpdatePatch->version              = 0x00;
+    nimUpdatePatch->patchSize            = nimUpdateSize;
     nimUpdatePatch->patchNameSize        = 16;
     nimUpdatePatch->descriptionSize      = 62;
     nimUpdatePatch->processNameSize      = 3;
@@ -398,7 +402,7 @@ void createDefaultPatches()
     {
         file = fopen(filepath.c_str(),"c"); 
     }
-    fwrite(nimUpdatePatch,1,(sizeof(binPatch)+sizeof(nimUpdateBytes)),file);
+    fwrite(nimUpdatePatch, 1, (nimUpdateSize), file);
     fclose(file);
     free(nimUpdatePatch);
 

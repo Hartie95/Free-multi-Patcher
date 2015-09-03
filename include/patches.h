@@ -38,7 +38,8 @@ typedef struct codeStruct
 
 typedef struct patchStruct
 {
-    char   version;
+    u8    version;
+    u32   patchSize;
     u32   patchNameSize;
     u32   descriptionSize;
     u32   processNameSize;
