@@ -18,8 +18,6 @@ using namespace std;
 
 vector<Patch*> loadedPatches;
 vector<PatchCollection*> loadedCollections;
-u32 numberOfLoadedPatches;
-u32 numberOfLoadedCollections;
 string enabledPatches[10];
 
 void initPatches()
@@ -38,19 +36,10 @@ void checkPatchFolder()
 
 void loadPatchFiles()
 {  
-
-
     DIR *dir;
     dir = opendir(patchesFolder.c_str());
     if (dir)
     {
-        //u32 numberOfPatchFiles=getNumberOfPatchFiles(dir);
-        //loadedPatches=(patch** )malloc(numberOfPatchFiles*sizeof(patch *));
-
-        closedir(dir);
-        dir = opendir(patchesFolder.c_str());
-        numberOfLoadedPatches=0;
-        numberOfLoadedCollections = 0;
         struct dirent *currenElement;
         while ((currenElement = readdir(dir)) != NULL)
         {
@@ -64,7 +53,6 @@ void loadPatchFiles()
                 {
                     loadedPatches.push_back(new Patch(tmp));
                     free(tmp);
-                    numberOfLoadedPatches++;
                 }
             }
             else  if(isCollection(currenElement))
@@ -79,7 +67,6 @@ void loadPatchFiles()
                     
                     loadedCollections.push_back(tmpCollection);
                     free(tmp);
-                    numberOfLoadedCollections++;
                 }
             }
         }
@@ -107,8 +94,13 @@ int createPatchPage(MenuManager* menuManager)
 bool isPatch(struct dirent* file)
 {
     u32 nameLength=strlen(file->d_name);
-    if (nameLength >= patchExtension.size() && strcmp(file->d_name + nameLength - patchExtension.size(), patchExtension.c_str()) == 0) {
-        return true;
+    if (nameLength >= patchExtension.size())
+    {
+        u32 extensionStart = nameLength - patchExtension.size();
+        if (strcmp(file->d_name + extensionStart, patchExtension.c_str()) == 0)
+        {
+            return true;
+        }
     }
 
     return false;
@@ -173,58 +165,49 @@ binPatchCollection* loadCollection(FILE* file)
     return loadedPatch;
 }
 
-int applyPatches(){
-
-  //PatchSrvAccess();  
-  Patch* currentPatch;
-  bool ignoreKernelVersion=false;
-  for(std::vector<Patch*>::iterator it = loadedPatches.begin(); it != loadedPatches.end(); ++it)
-  {
-    currentPatch = (*it);
-    if(currentPatch->isEnabled())
-        if (checkKernelVersion(currentPatch->getMinKernelVersion(), currentPatch->getMaxKernelVersion()) || ignoreKernelVersion)
+int applyPatches()
+{  
+    Patch* currentPatch;
+    bool ignoreKernelVersion=false;
+    for(std::vector<Patch*>::iterator it = loadedPatches.begin(); it != loadedPatches.end(); ++it)
+    {
+        currentPatch = (*it);
+        if (currentPatch->isEnabled())
         {
-            findAndReplaceCode(currentPatch);
+            if (checkKernelVersion(currentPatch->getMinKernelVersion(), currentPatch->getMaxKernelVersion()) || ignoreKernelVersion)
+            {
+                findAndReplaceCode(currentPatch);
+            }
         }
-  }
-  PatchCollection* currentCollection;
-  for (std::vector<PatchCollection*>::iterator it = loadedCollections.begin(); it != loadedCollections.end(); ++it)
-  {
-      currentCollection = (*it);
-      if (currentCollection->isEnabled())
-      {
-          vector<Patch*>* collectionPatches = currentCollection->getAllPatches();
-          for (std::vector<Patch*>::iterator it = collectionPatches->begin(); it != collectionPatches->end(); ++it)
-          {
-              currentPatch = (*it);
-              if (currentPatch->isEnabled())
-                  if (checkKernelVersion(currentPatch->getMinKernelVersion(), currentPatch->getMaxKernelVersion()) || ignoreKernelVersion)
-                  {
-                      findAndReplaceCode(currentPatch);
-                  }
-          }
-      }
-  }
+    }
 
-  return 0;
+    PatchCollection* currentCollection;
+    for (std::vector<PatchCollection*>::iterator it = loadedCollections.begin(); it != loadedCollections.end(); ++it)
+    {
+        currentCollection = (*it);
+        if (currentCollection->isEnabled())
+        {
+            vector<Patch*>* collectionPatches = currentCollection->getAllPatches();
+            for (std::vector<Patch*>::iterator it = collectionPatches->begin(); it != collectionPatches->end(); ++it)
+            {
+                currentPatch = (*it);
+                if (currentPatch->isEnabled())
+                {
+                    if (checkKernelVersion(currentPatch->getMinKernelVersion(), currentPatch->getMaxKernelVersion()) || ignoreKernelVersion)
+                    {
+                        findAndReplaceCode(currentPatch);
+                    }
+                }
+            }
+        }
+    }
+
+    return 0;
 }
 
 int getNumberLoadedPatches()
 {
     return loadedPatches.size();
-}
-
-int getNumberOfPatchFiles(DIR* dir)
-{
-    u32 numberOfFiles=0;
-    struct dirent *currenElement;
-    while ((currenElement = readdir(dir)) != NULL)
-    {
-        if(isPatch(currenElement))
-            numberOfFiles++;
-    }
-    seekdir(dir,SEEK_SET);
-    return numberOfFiles;
 }
 
 void* getProcessAddress(u32 startAddress,u32 processNameSize,const char* processName)

@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include <ctrcommon/fs.hpp> 
-//#include <sys/stat.h>
+#include <ctrcommon/fs.hpp>
 #include <stdlib.h>
 
 #include "patches.h"
@@ -184,25 +183,8 @@ void PatchSrvAccess()
 //-----------------------------------------------------------------------------
 
 /*
-Todo: find offsets
-int patchDlp()
-{
-    // Set generell informations for patching
-    static const char * titleId = "dlp";
-    static const u32 startAddress = 0x00008000;
-
-    // patch NS to return update doesnt need to be installed intead of CVer not found error code after Update Check
-    // 9.0.0 Addresses: 0x00102acc, 0x001894f4;
-    static char patchcode[] = { 0x0B, 0x18, 0x21, 0xC8 };  
-    static unsigned char originalcode[] = { 0x0C, 0x18, 0xE1, 0xD8 };
-    findAndReplace(titleId, 2, startAddress, 0x00010000, 2, originalcode, sizeof(originalcode), patchcode, sizeof(patchcode));
-
-    return 0;
-}*/
-
-/*
 Todo:
-//doesnt work atm(crashes)*//*
+doesnt work atm(crashes)
 int changeSerial()
 {
     // Target title id
@@ -226,95 +208,8 @@ int changeSerial()
 void createDefaultPatches()
 {
     FILE *file ;
-
-    // create the default patch files
-    // patch Homemenu to show out of region applications
-    // 9.0.0 Address: 0x00101B8C;
-    char menuBytes[]=/*patchName*/  "region patch menu"
-                    /*description*/ "Patches the home menu to show out of region games"
-                    /*processname*/ "menu"
-                    /*OriginalCode*/"\x00\x00\x55\xE3\x01\x10\xA0\xE3\x11\x00\xA0\xE1\x03\x00\x00\x0A" 
-                    /*patchBegin*/  "\x01\x00\xA0\xE3\x70\x80\xBD\xE8";
-
-    binPatch* menuPatch=(binPatch*)malloc(sizeof(binPatch)+sizeof(menuBytes));
+    string filepath="";
     
-    menuPatch->version              = 0x00;
-    menuPatch->patchNameSize        = 17;
-    menuPatch->descriptionSize      = 49;
-    menuPatch->processNameSize      = 4;
-    menuPatch->originalcodeSize     = 16;
-    menuPatch->patchcodeSize        = 8;
-    menuPatch->processType          = 0x01;
-    menuPatch->minKernelVersion     = {0x00, 0x00, 0x00, 0x00};
-    menuPatch->maxKernelVersion     = {0xFF, 0xFF, 0xFF, 0xFF};
-    menuPatch->minFirmwareVersion   = { 4, 0, 0, 0 };
-    menuPatch->maxFirmwareVersion   = { 9, 9, 0, 255 };
-    menuPatch->regionsSupported     = {1,1,1,1,1,1,1,0};
-    menuPatch->nandCompability      = {1,1,0};
-    menuPatch->patchType            = 0x00;
-    menuPatch->startAddressProcess  = 0x00100000;
-    menuPatch->startAddressGlobal   = 0x26960000;
-    menuPatch->searchAreaSize       = 0x001A0000;
-    menuPatch->numberOfReplacements = 0x01;
-
-    memcpy(menuPatch->binaryData, menuBytes, sizeof(menuBytes));
-
-    string menuPatchFileName="regionMenu"+patchExtension;
-
-    string filepath=patchesFolder+menuPatchFileName;
-    /*file = fopen(filepath.c_str(),"w"); 
-    if (file == NULL) 
-    {
-        file = fopen(filepath.c_str(),"c"); 
-    }
-    //fwrite(menuPatch,1,(sizeof(binPatch)+sizeof(menuBytes)),file);
-    fclose(file);*/
-    free(menuPatch);
-
-    // patch NS to return update doesnt need to be installed intead of CVer not found error code after Update Check
-    // 9.0.0 Addresses: 0x00102acc, 0x001894f4; 
-    char nsBytes[]= /*patchName*/   "region patch menu"
-                    /*description*/ "Patches the home menu to show out of region games"
-                    /*processname*/ "ns"
-                    /*OriginalCode*/"\x0C\x18\xE1\xD8" 
-                    /*patchBegin*/  "\x0B\x18\x21\xC8";
-
-    binPatch* nsPatch=(binPatch*)malloc(sizeof(binPatch)+sizeof(nsBytes));
-    
-    nsPatch->version              = 0x00;
-    nsPatch->patchNameSize        = 17;
-    nsPatch->descriptionSize      = 49;
-    nsPatch->processNameSize      = 2;
-    nsPatch->originalcodeSize     = 4;
-    nsPatch->patchcodeSize        = 4;
-    nsPatch->processType          = 0x01;
-    nsPatch->minKernelVersion     = { 0, 4, 33, 2 };
-    nsPatch->maxKernelVersion     = { 255, 1, 50, 2 };
-    nsPatch->minFirmwareVersion   = {0x00, 0x00, 0x00, 0x00};
-    nsPatch->maxFirmwareVersion   = {0xFF, 0xFF, 0xFF, 0xFF};
-    nsPatch->regionsSupported     = {1,1,1,1,1,1,1,0};
-    nsPatch->nandCompability      = {1,1,0};
-    nsPatch->patchType            = 0x00;
-    nsPatch->startAddressProcess  = 0x00018000;
-    nsPatch->startAddressGlobal   = 0x26A00000;
-    nsPatch->searchAreaSize       = 0x00100000;
-    nsPatch->numberOfReplacements = 0x02;
-
-    memcpy(nsPatch->binaryData, nsBytes, sizeof(nsBytes));
-
-    string nsPatchFileName="regionNs"+patchExtension;
-
-    filepath=patchesFolder+nsPatchFileName;
-    /*file = fopen(filepath.c_str(),"w"); 
-    if (file == NULL) 
-    {
-        file = fopen(filepath.c_str(),"c"); 
-    }
-    //fwrite(nsPatch,1,(sizeof(binPatch)+sizeof(nsBytes)),file);
-    fclose(file);*/
-    free(nsPatch);
-
-
     // Patch nim to answer, that no update is available(doesnt affect updating in systemsettings)
     // 9.0.0 Address: 0x0000DD28  
     char nimSpoofBytes[]=   /*patchName*/   "e-shop spoof"
@@ -336,8 +231,8 @@ void createDefaultPatches()
     nimSpoofPatch->processType          = 0x01;
     nimSpoofPatch->minKernelVersion     = {0x00, 0x00, 0x00, 0x00};
     nimSpoofPatch->maxKernelVersion     = {0xFF, 0xFF, 0xFF, 0xFF};
-    menuPatch->minFirmwareVersion       = { 9, 0, 0, 20 };
-    menuPatch->maxFirmwareVersion       = { 9, 9, 0, 26 };
+    nimSpoofPatch->minFirmwareVersion = { 9, 0, 0, 20 };
+    nimSpoofPatch->maxFirmwareVersion = { 9, 9, 0, 26 };
     nimSpoofPatch->regionsSupported     = {1,1,1,1,1,1,1,0};
     nimSpoofPatch->nandCompability      = {1,1,0};
     nimSpoofPatch->patchType            = 0x00;
@@ -382,8 +277,8 @@ void createDefaultPatches()
     nimUpdatePatch->processType          = 0x01;
     nimUpdatePatch->minKernelVersion     = {0x00, 0x00, 0x00, 0x00};
     nimUpdatePatch->maxKernelVersion     = {0xFF, 0xFF, 0xFF, 0xFF};
-    menuPatch->minFirmwareVersion        = { 4, 0, 0, 0 };
-    menuPatch->maxFirmwareVersion        = { 9, 9, 0, 255 };
+    nimUpdatePatch->minFirmwareVersion = { 4, 0, 0, 0 };
+    nimUpdatePatch->maxFirmwareVersion = { 9, 9, 0, 255 };
     nimUpdatePatch->regionsSupported     = {1,1,1,1,1,1,1,0};
     nimUpdatePatch->nandCompability      = {1,1,0};
     nimUpdatePatch->patchType            = 0x00;
