@@ -7,19 +7,39 @@
 #include "menuManager.h"
 
 
-void initPatches();
-void checkPatchFolder();
-void loadPatchFiles();
-int createPatchPage(MenuManager* menuManager);
+class PatchManager
+{
+private:
+    bool isType(struct dirent* file, std::string extension);
+    void* loadFile(FILE* file, size_t minSize);
+    bool isPatch(struct dirent* file);
+    bool isCollection(struct dirent* file);
 
-bool isPatch(struct dirent* file);
-bool isCollection(struct dirent* file);
-void* getProcessAddress(u32 startAddress,u32 processNameSize,char* processName);
-int findAndReplaceCode(Patch* _patch);
+    void applyPatches(std::vector<Patch*>* patchList);
+    int findAndReplaceCode(Patch* _patch);
+    void replaceCodeAt(Patch* _patch);
+    void findAndRepalaceString(Patch* _patch);
+    void* getProcessAddress(u32 startAddress, u32 processNameSize, const char* processName);
 
-bool checkKernelVersion(kernelVersion min, kernelVersion max);
+    
+    void* getProcessAddress(u32 startAddress, u32 processNameSize, char* processName);
 
-binPatch* loadPatch(FILE* file);
-binPatchCollection* loadCollection(FILE* file);
+    bool checkCompatibility(Patch* _patch);
+    bool checkCompatibility(PatchCollection* _collection);
 
-int  applyPatches();
+    bool checkKernelVersion(kernelVersion min, kernelVersion max);
+protected:
+public:
+    PatchManager();
+    void checkPatchFolder();
+    void loadPatchFiles();
+    int createPatchPage(MenuManager* menuManager);
+
+
+    binPatch* loadPatch(FILE* file);
+    binPatchCollection* loadCollection(FILE* file);
+
+    int  applyPatches();
+
+    int getNumberLoadedPatches();   
+};

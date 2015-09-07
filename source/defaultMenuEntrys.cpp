@@ -4,8 +4,8 @@ using namespace std;
 
 MenuEntry::MenuEntry(std::string name, std::string description)
 {
-	this->name=name;
-	this->description = description;
+	this->setName(name);
+	this->setDescription(description);
 }
 
 int MenuEntry::sideAction() 
@@ -19,10 +19,33 @@ int MenuEntry::aAction()
 }
 void MenuEntry::setName(string name)
 {
-	this->name=name;
+    int length = name.size();
+    string returnString = name;
+
+    for (u32 i = length; i < this->maxNameLength; i++)
+    {
+        returnString += " ";
+    }
+    this->name = returnString;
 }
+
 void MenuEntry::setDescription(string description)
 {
+    u32 lastSpace = 0;
+    u32 lastBreak = 0;
+    u32 size = description.size();
+    for (u32 i = 0; i < size; i++)
+    {
+        if (description.at(i) == ' ')
+        {
+            lastSpace = i;
+        }
+        if (i - lastBreak >= this->maxDescriptionLength)
+        {
+            lastBreak = lastSpace;
+            description[lastSpace] = '\n';
+        }
+    }
 	this->description=description;
 }
 
@@ -43,9 +66,9 @@ string MenuEntry::getRow()
 
 BackMenuEntry::BackMenuEntry(MenuManagerM* manager,string name, string description)
 {
-	this->manager = manager;
-	this->name = name;
-	this->description = description;
+    this->manager = manager;
+    this->setName(name);
+    this->setDescription(description);
 }
 
 int BackMenuEntry::aAction() 
@@ -62,9 +85,9 @@ void BackMenuEntry::back()
 NavigationMenuEntry::NavigationMenuEntry(MenuManagerM* manager,MenuM* menu,std::string name, std::string description)
 {
 	this->manager = manager;
-	this->menu = menu;
-	this->name = name;
-	this->description = description;
+    this->menu = menu;
+    this->setName(name);
+    this->setDescription(description);
 }
 
 int NavigationMenuEntry::aAction() 
@@ -83,9 +106,9 @@ YesNoMenuEntry::YesNoMenuEntry(bool* value,std::string name, std::string descrip
 {
 	if(value==nullptr)
 		value=new bool(true);
-	this->value=value;
-	this->name=name;
-	this->description=description;
+    this->value = value;
+    this->setName(name);
+    this->setDescription(description);
 }
 
 string YesNoMenuEntry::getValueString(bool value)
@@ -106,13 +129,7 @@ int YesNoMenuEntry::sideAction()
 
 string YesNoMenuEntry::getRow()
 {
-	int length=this->name.size();
 	string returnString=this->name;
-
-	for(u32 i = length; i < this->maxNameLength; i++)
-	{
-		returnString+=" ";
-	}
 	returnString+="  "+getValueString(*this->value);
 	return returnString;
 }

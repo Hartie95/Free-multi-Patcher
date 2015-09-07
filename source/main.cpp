@@ -16,6 +16,15 @@
 
 using namespace std;
 
+
+PatchManager* patchManager;
+MenuManager* menuManager;
+
+int applyPatches()
+{
+    return patchManager->applyPatches();
+}
+
 int checkVersion()
 {
     int onlineVersion=version;
@@ -96,34 +105,34 @@ int main(int argc, char **argv) {
    
   short exitLoop=false;
   initCfgu();
-  initPatches();
+  patchManager= new PatchManager();
   SaveVersionConstants();
-  MenuManager* menu=new MenuManager();
-  Menu* testMenu=new Menu(menu,menu->getMainPage());
-  Menu* testMenu2=new Menu(menu,testMenu);
+  menuManager = new MenuManager();
+  Menu* testMenu = new Menu(menuManager, menuManager->getMainPage());
+  Menu* testMenu2 = new Menu(menuManager, testMenu);
   
-  createPatchPage(menu);
+  patchManager->createPatchPage(menuManager);
 
   bool testbool=true;
   YesNoMenuEntry* testEntryYesNo=new YesNoMenuEntry(&testbool,"testEntryYesNo","This is a testButton\ntestbutton");
   testMenu->addEntry((MenuEntry*)testEntryYesNo);
 
-  menu->addPage(testMenu,menu->getMainPage(),"testpage");
-  menu->addPage(testMenu2,testMenu,"testpage2");
+  menuManager->addPage(testMenu, menuManager->getMainPage(), "testpage");
+  menuManager->addPage(testMenu2, testMenu, "testpage2");
 
-  while(platformIsRunning()&&exitLoop==false) {
+  while(platformIsRunning()&&exitLoop==false) 
+  {
     //Todo: replace with switch case
-    exitLoop=menu->ManageInput();
+    exitLoop = menuManager->ManageInput();
     if(inputIsPressed(BUTTON_SELECT))
     {
-        u32 value=checkForUpdate();
-        char intStr[8];
-        itoa(value,intStr,16);
-        string versionstring=string(intStr);
-        Menu* versionMenu=new Menu(menu,menu->getMainPage());
-        menu->addPage(versionMenu,menu->getMainPage(),versionstring);
+        checkForUpdate();
     }
-    menu->drawMenu();
+    if (inputIsPressed(BUTTON_START)) {
+        KernelBackdoor(&applyPatches);
+        exitLoop = true;
+    }
+    menuManager->drawMenu();
   }
 
   HB_FlushInvalidateCache(); // Just to be sure!

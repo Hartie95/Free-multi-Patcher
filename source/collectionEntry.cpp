@@ -7,8 +7,8 @@ CollectionEntry::CollectionEntry(PatchCollection* collection,MenuManagerM* manag
 {
     this->value = new bool();
     this->collection = collection;
-    this->YesNoMenuEntry::setName(this->collection->getCollectionName());
-    this->YesNoMenuEntry::setDescription(this->collection->getDescription());
+    this->setName(this->collection->getCollectionName());
+    this->setDescription(this->collection->getDescription());
     *this->value = this->collection->isEnabled();
     this->manager = manager;
     this->menu = (MenuM*)new Menu((MenuManager*)this->manager,(Menu*)parentMenu);

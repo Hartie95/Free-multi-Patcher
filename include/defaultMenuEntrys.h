@@ -7,10 +7,6 @@
 #include <ctrcommon/service.hpp>
 #include "workaround.h"
 
-
-//#include "menuManager.h"
-
-
 class MenuEntry 
 {
 private:
@@ -18,6 +14,7 @@ protected:
 	std::string name;
 	std::string description;
     u32 maxNameLength = 25;
+    u32 maxDescriptionLength = 40;
 	MenuEntry(){
 
 	}

@@ -21,7 +21,7 @@ vector<Patch*> loadedPatches;
 vector<PatchCollection*> loadedCollections;
 string enabledPatches[10];
 
-void initPatches()
+PatchManager::PatchManager()
 {
     checkPatchFolder();
     createDefaultPatches();
@@ -29,13 +29,13 @@ void initPatches()
     loadPatchFiles();
 }
 
-void checkPatchFolder()
+void PatchManager::checkPatchFolder()
 {
     if(!fsExists(patchesFolder))
         mkdir(patchesFolder.c_str(), 0777);
 }
 
-void loadPatchFiles()
+void PatchManager::loadPatchFiles()
 {  
     DIR *dir;
     dir = opendir(patchesFolder.c_str());
@@ -75,7 +75,7 @@ void loadPatchFiles()
     closedir(dir);
 }
 
-int createPatchPage(MenuManager* menuManager)
+int PatchManager::createPatchPage(MenuManager* menuManager)
 {
   Menu* page=new Menu(menuManager,menuManager->getMainPage());
 
@@ -99,127 +99,103 @@ int createPatchPage(MenuManager* menuManager)
   return 0;
 }
 
-
-bool isPatch(struct dirent* file)
-{
-    u32 nameLength=strlen(file->d_name);
-    if (nameLength >= patchExtension.size())
-    {
-        u32 extensionStart = nameLength - patchExtension.size();
-        if (strcmp(file->d_name + extensionStart, patchExtension.c_str()) == 0)
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool isCollection(struct dirent* file)
+bool PatchManager::isType(struct dirent* file, string extension)
 {
     u32 nameLength = strlen(file->d_name);
-    if (nameLength >= patchCollectionExtension.size())
+    if (nameLength >= extension.size())
     {
-        u32 extensionStart = nameLength - patchCollectionExtension.size();
-        if (strcmp(file->d_name + extensionStart, patchCollectionExtension.c_str()) == 0)
+        u32 extensionStart = nameLength - extension.size();
+        if (strcmp(file->d_name + extensionStart, extension.c_str()) == 0)
         {
             return true;
         }
     }
-
     return false;
 }
 
-binPatch* loadPatch(FILE* file)
+bool PatchManager::isPatch(struct dirent* file)
 {
-    binPatch* loadedPatch=nullptr;
-    if(file != NULL)
-    {    
-        fseek(file, 0L, SEEK_END);
-        u32 fileSize = ftell(file);
-        fseek(file, 0L, SEEK_SET);
-
-        if (fileSize < sizeof(binPatch))
-            return nullptr;
-
-        loadedPatch=(binPatch*)malloc(fileSize);
-        if(loadedPatch!=nullptr)
-        {
-            fread(loadedPatch,1,fileSize,file);
-        }
-        fclose(file);
-    }
-    return loadedPatch;
+    return isType(file, patchExtension);
 }
 
-binPatchCollection* loadCollection(FILE* file)
+bool PatchManager::isCollection(struct dirent* file)
 {
-    binPatchCollection* loadedPatch = nullptr;
+    return isType(file, patchCollectionExtension);
+}
+
+void* PatchManager::loadFile(FILE* file, size_t minSize)
+{
+    void* loadedFile = nullptr;
     if (file != NULL)
     {
         fseek(file, 0L, SEEK_END);
         u32 fileSize = ftell(file);
         fseek(file, 0L, SEEK_SET);
 
-        if (fileSize < (sizeof(binPatch)+sizeof(binPatchCollection)))
+        if (fileSize < minSize)
             return nullptr;
 
-        loadedPatch = (binPatchCollection*)malloc(fileSize);
-        if (loadedPatch != nullptr)
+        loadedFile = (void*)malloc(fileSize);
+        if (loadedFile != nullptr)
         {
-            fread(loadedPatch, 1, fileSize, file);
+            fread(loadedFile, 1, fileSize, file);
         }
         fclose(file);
     }
+    return loadedFile;
+}
+
+binPatch* PatchManager::loadPatch(FILE* file)
+{
+    binPatch* loadedPatch = (binPatch*)loadFile(file, sizeof(binPatch));
     return loadedPatch;
 }
 
-int applyPatches()
+binPatchCollection* PatchManager::loadCollection(FILE* file)
+{
+    binPatchCollection* loadedCollection = (binPatchCollection*)loadFile(file, (sizeof(binPatch) + sizeof(binPatchCollection)));
+    return loadedCollection;
+}
+
+int PatchManager::applyPatches()
 {  
-    Patch* currentPatch;
-    bool ignoreKernelVersion=false;
-    for(std::vector<Patch*>::iterator it = loadedPatches.begin(); it != loadedPatches.end(); ++it)
+    PatchCollection* currentCollection;
+    for (std::vector<PatchCollection*>::iterator it = loadedCollections.begin(); it != loadedCollections.end(); ++it)
+    {
+        currentCollection = (*it);
+        if (currentCollection->isEnabled()&&checkCompatibility(currentCollection))
+        {
+            applyPatches(currentCollection->getAllPatches());
+        }
+    }
+
+    applyPatches(&loadedPatches);
+
+    return 0;
+}
+
+void PatchManager::applyPatches(vector<Patch*>* patchList)
+{
+    Patch* currentPatch = nullptr;
+    for (std::vector<Patch*>::iterator it = patchList->begin(); it != patchList->end(); ++it)
     {
         currentPatch = (*it);
         if (currentPatch->isEnabled())
         {
-            if (checkKernelVersion(currentPatch->getMinKernelVersion(), currentPatch->getMaxKernelVersion()) || ignoreKernelVersion)
+            if (checkCompatibility(currentPatch))
             {
                 findAndReplaceCode(currentPatch);
             }
         }
     }
-
-    PatchCollection* currentCollection;
-    for (std::vector<PatchCollection*>::iterator it = loadedCollections.begin(); it != loadedCollections.end(); ++it)
-    {
-        currentCollection = (*it);
-        if (currentCollection->isEnabled())
-        {
-            vector<Patch*>* collectionPatches = currentCollection->getAllPatches();
-            for (std::vector<Patch*>::iterator it = collectionPatches->begin(); it != collectionPatches->end(); ++it)
-            {
-                currentPatch = (*it);
-                if (currentPatch->isEnabled())
-                {
-                    if (checkKernelVersion(currentPatch->getMinKernelVersion(), currentPatch->getMaxKernelVersion()) || ignoreKernelVersion)
-                    {
-                        findAndReplaceCode(currentPatch);
-                    }
-                }
-            }
-        }
-    }
-
-    return 0;
 }
 
-int getNumberLoadedPatches()
+int PatchManager::getNumberLoadedPatches()
 {
     return loadedPatches.size();
 }
 
-void* getProcessAddress(u32 startAddress,u32 processNameSize,const char* processName)
+void* PatchManager::getProcessAddress(u32 startAddress, u32 processNameSize, const char* processName)
 {
     KCodeSet* code_set = FindTitleCodeSet(processName,processNameSize);
     if (code_set == nullptr)
@@ -228,7 +204,7 @@ void* getProcessAddress(u32 startAddress,u32 processNameSize,const char* process
     return (void*) FindCodeOffsetKAddr(code_set, startAddress);
 }
 
-int findAndReplaceCode(Patch* _patch)
+int PatchManager::findAndReplaceCode(Patch* _patch)
 {
     u32 numberOfReplaces = _patch->getNumberOfReplacements();
 
@@ -268,7 +244,106 @@ int findAndReplaceCode(Patch* _patch)
     return 0;
 }
 
-bool checkKernelVersion(kernelVersion min, kernelVersion max)
+void PatchManager::replaceCodeAt(Patch* _patch)
+{
+    const u32 destination = _patch->getStartAddressProcess();
+
+    const char* processName = _patch->getProcessName().c_str();
+    u32 processNameSize = _patch->getProcessName().size();
+
+    code patchCode = _patch->getPatchCode();
+
+    u8 * destinationPointer = (u8 *)getProcessAddress(destination, processNameSize, processName);
+    if (destinationPointer == nullptr)
+        return;
+            
+    memcpy(destinationPointer, patchCode.code, patchCode.codeSize);
+
+    return;
+}
+
+void PatchManager::findAndRepalaceString(Patch* _patch)
+{
+    u32 numberOfReplaces = _patch->getNumberOfReplacements();
+
+    const u32 startAddress = _patch->getStartAddressProcess();
+    const u32 area = _patch->getSearchAreaSize();
+
+    const char* processName = _patch->getProcessName().c_str();
+    u32 processNameSize = _patch->getProcessName().size();
+
+    code originalCode = _patch->getOriginalCode();
+    code patchCode = _patch->getPatchCode();
+
+
+    u8 * startAddressPointer = (u8 *)getProcessAddress(startAddress, processNameSize, processName);
+    if (startAddressPointer == nullptr)
+        return;
+    u8 * destination = nullptr;
+    u32 numberOfFounds = 0;
+
+    for (u32 i = 0; i < area && numberOfFounds <= numberOfReplaces; i += 4)
+    {
+        //check for the original code position
+        bool found = true;
+        for (u32 x = 0; x < originalCode.codeSize && found == true; x += 4)
+        {
+            if ((*((u32*)(startAddressPointer + i + x)) != *((u32*)&originalCode.code[x])))
+                found = false;
+        }
+        if (found == true)
+        {
+            //Apply patches, if the addresses was found  
+            destination = startAddressPointer + i;
+            memcpy(destination, patchCode.code, patchCode.codeSize);
+            numberOfFounds++;
+        }
+    }
+    return;
+}
+
+
+//todo manage settings
+bool ignoreFirmware = true;
+bool ignoreKernel = true;
+bool ignoreRegion = true;
+bool ignoreFirmwareCollection = true;
+bool ignoreKernelCollection = true;
+bool ignoreRegionCollection = true;
+
+bool PatchManager::checkCompatibility(Patch* _patch)
+{
+    if (_patch == nullptr)
+        return false;
+
+    bool compatibleFirmware = true;
+    bool compatibleKernel = checkKernelVersion(_patch->getMinKernelVersion(), _patch->getMaxKernelVersion());
+    bool compatibleRegion = true;
+
+    bool compatible = (compatibleFirmware || ignoreFirmware)
+        && (compatibleKernel || ignoreKernel)
+        && (compatibleRegion || ignoreRegion);
+
+    return compatible;
+}
+
+bool PatchManager::checkCompatibility(PatchCollection* _collection)
+{
+    if (_collection == nullptr)
+        return false;
+
+    bool compatibleFirmware = true;
+    bool compatibleKernel = checkKernelVersion(_collection->getMinKernelVersion(), _collection->getMaxKernelVersion());
+    bool compatibleRegion = true;
+
+    bool compatible = (compatibleFirmware || ignoreFirmware)
+        && (compatibleKernel || ignoreKernel)
+        && (compatibleRegion || ignoreRegion);
+
+    return compatible;
+}
+
+bool PatchManager::checkKernelVersion(kernelVersion min, kernelVersion max)
 {
     u32 kernelValue = osGetKernelVersion();
     bool minBool = false;

@@ -7,6 +7,7 @@
 
 using namespace std;
 
+
 MenuManager::MenuManager()
 {
 	this->mainPage=new Menu(this,nullptr);
@@ -41,11 +42,6 @@ bool MenuManager::ManageInput()
 
     if(inputIsPressed(BUTTON_B)) {
     	this->back();
-    }
-
-    if(inputIsPressed(BUTTON_START)) {
-      	KernelBackdoor(&applyPatches);
-      	this->exit = true;
     }
 
     return this->exit;
