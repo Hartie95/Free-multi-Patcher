@@ -12,6 +12,7 @@
 #include "kobjects.h"
 
 #include "patchEntry.h"
+#include "collectionEntry.h"
 
 
 using namespace std;
@@ -78,6 +79,14 @@ int createPatchPage(MenuManager* menuManager)
 {
   Menu* page=new Menu(menuManager,menuManager->getMainPage());
 
+  PatchCollection* currentCollection;
+  for (std::vector<PatchCollection*>::iterator it = loadedCollections.begin(); it != loadedCollections.end(); ++it)
+  {
+      currentCollection = (*it);
+      CollectionEntry* entry = new CollectionEntry(currentCollection,(MenuManagerM*)menuManager,(MenuM*)page);
+      page->addEntry((MenuEntry*)entry);
+  }
+ 
   Patch* currentPatch;
   for(std::vector<Patch*>::iterator it = loadedPatches.begin(); it != loadedPatches.end(); ++it)
   {

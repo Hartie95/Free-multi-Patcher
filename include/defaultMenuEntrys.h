@@ -17,6 +17,7 @@ private:
 protected:
 	std::string name;
 	std::string description;
+    u32 maxNameLength = 25;
 	MenuEntry(){
 
 	}
@@ -41,18 +42,19 @@ public:
 	void back();
 };
 
-class NavigationMenuEntry : protected MenuEntry 
+class NavigationMenuEntry : virtual protected MenuEntry 
 {
-private:
+protected:
 	MenuM* 		  menu;
 	MenuManagerM* manager;
+    NavigationMenuEntry(){};
 public:
 	NavigationMenuEntry(MenuManagerM* manager,MenuM* menu,std::string name, std::string description);
 	int aAction();
 	void navigate();
 };
 
-class YesNoMenuEntry : protected MenuEntry 
+class YesNoMenuEntry : virtual protected MenuEntry 
 {
 private:
 protected:

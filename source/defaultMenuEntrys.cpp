@@ -106,15 +106,13 @@ int YesNoMenuEntry::sideAction()
 
 string YesNoMenuEntry::getRow()
 {
-	int nameLength=20;
 	int length=this->name.size();
 	string returnString=this->name;
 
-	for(int i=length;i<nameLength;i++)
+	for(u32 i = length; i < this->maxNameLength; i++)
 	{
 		returnString+=" ";
 	}
 	returnString+="  "+getValueString(*this->value);
 	return returnString;
-	//this->name;
 }

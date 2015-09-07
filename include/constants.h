@@ -7,12 +7,15 @@
 #include <string.h>
 //Application Constands 
 static const std::string applicationFolder = "sdmc:/fmp/";
+
 static const std::string patchesFolder = applicationFolder+"patches/";
 static const std::string patchExtension = ".patch";
 static const std::string patchCollectionExtension = ".collection";
+
 static const std::string settingsFolder=applicationFolder+"settings/";
 static const std::string settingsFileName="settings.cfg";
-static const u32 version=0x006015;
+
+static const u32 version=0x006020;
 
 //System Contands
 typedef struct kernelVersionStruct
