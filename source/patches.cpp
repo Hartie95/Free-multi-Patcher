@@ -8,7 +8,6 @@
 using namespace std;
 
     
-
 Patch::Patch(binPatch *_patch)
 {
     u32 processNamePosition=_patch->patchNameSize+_patch->descriptionSize;
@@ -44,6 +43,7 @@ Patch::Patch(binPatch *_patch)
 
     this->changeStatus(true);
 }
+
 Patch::~Patch()
 {
     free(this->originalCode.code);
@@ -92,50 +92,54 @@ u8 Patch::getPatchType()
     return this->patchType;
 }
 
-u32   Patch::getStartAddressProcess()
+u32 Patch::getStartAddressProcess()
 {
     return this->startAddressProcess;
 }
 
-u32   Patch::getStartAddressGlobal()
+u32 Patch::getStartAddressGlobal()
 {
     return this->startAddressGlobal;
 }
 
-u32     Patch::getSearchAreaSize()
+u32 Patch::getSearchAreaSize()
 {
     return this->searchAreaSize;
 }
 
-u32     Patch::getNumberOfReplacements()
+u32 Patch::getNumberOfReplacements()
 {
     return this->numberOfReplacements;
 }
 
-code   Patch::getOriginalCode()
+u32 Patch::getPatchOffset()
+{
+    return this->patchOffset;
+}
+
+code Patch::getOriginalCode()
 {
     return this->originalCode;
 }
 
-code   Patch::getPatchCode()
+code Patch::getPatchCode()
 {
     return this->patchCode;
 }
 
 
-
-bool    Patch::changeStatus()
+bool Patch::changeStatus()
 {
     return this->changeStatus(!this->enabled);
 }
 
-bool    Patch::changeStatus(bool status)
+bool Patch::changeStatus(bool status)
 {
     this->enabled=status;
     return this->enabled;
 }
 
-bool    Patch::isEnabled()
+bool Patch::isEnabled()
 {
     return this->enabled;
 }
@@ -240,6 +244,7 @@ void createDefaultPatches()
     nimSpoofPatch->startAddressGlobal   = 0x26A00000;
     nimSpoofPatch->searchAreaSize       = 0x00100000;
     nimSpoofPatch->numberOfReplacements = 0x01;
+    nimSpoofPatch->patchOffset          = 0;
 
     memcpy(nimSpoofPatch->binaryData, nimSpoofBytes, sizeof(nimSpoofBytes));
 
@@ -286,6 +291,7 @@ void createDefaultPatches()
     nimUpdatePatch->startAddressGlobal   = 0x26A00000;
     nimUpdatePatch->searchAreaSize       = 0x00010000;
     nimUpdatePatch->numberOfReplacements = 0x01;
+    nimUpdatePatch->patchOffset          = 0;
 
     memcpy(nimUpdatePatch->binaryData, nimUpdateBytes, sizeof(nimUpdateBytes));
 

@@ -17,6 +17,7 @@
 
 using namespace std;
 
+//TODO move to class
 vector<Patch*> loadedPatches;
 vector<PatchCollection*> loadedCollections;
 string enabledPatches[10];
@@ -207,6 +208,7 @@ void* PatchManager::getProcessAddress(u32 startAddress, u32 processNameSize, con
 int PatchManager::findAndReplaceCode(Patch* _patch)
 {
     u32 numberOfReplaces = _patch->getNumberOfReplacements();
+    u32 codeShift = _patch->getPatchOffset();
 
     const u32 startAddress = _patch->getStartAddressProcess();
     const u32 area = _patch->getSearchAreaSize();  
@@ -236,7 +238,7 @@ int PatchManager::findAndReplaceCode(Patch* _patch)
         if( found==true)
         {    
             //Apply patches, if the addresses was found  
-            destination = startAddressPointer + i;
+            destination = startAddressPointer + i + codeShift;
             memcpy(destination, patchCode.code, patchCode.codeSize);
             numberOfFounds++;
         }  
@@ -264,7 +266,8 @@ void PatchManager::replaceCodeAt(Patch* _patch)
 
 void PatchManager::findAndRepalaceString(Patch* _patch)
 {
-    u32 numberOfReplaces = _patch->getNumberOfReplacements();
+    u32 numberOfReplaces = _patch->getNumberOfReplacements(); 
+    u32 stringCharacterOffset = _patch->getPatchOffset();
 
     const u32 startAddress = _patch->getStartAddressProcess();
     const u32 area = _patch->getSearchAreaSize();
@@ -282,18 +285,18 @@ void PatchManager::findAndRepalaceString(Patch* _patch)
     u8 * destination = nullptr;
     u32 numberOfFounds = 0;
 
-    for (u32 i = 0; i < area && numberOfFounds <= numberOfReplaces; i += 4)
+    for (u32 i = 0; i < area && numberOfFounds <= numberOfReplaces; i++)
     {
         //check for the original code position
         bool found = true;
-        for (u32 x = 0; x < originalCode.codeSize && found == true; x += 4)
+        for (u32 x = 0; x < originalCode.codeSize && found == true; x += 1 + stringCharacterOffset)
         {
-            if ((*((u32*)(startAddressPointer + i + x)) != *((u32*)&originalCode.code[x])))
+            if ((*((startAddressPointer + i + x)) != *(&originalCode.code[x])))
                 found = false;
         }
         if (found == true)
         {
-            //Apply patches, if the addresses was found  
+            //Apply patches, if the addresses was found  /*TODO*/
             destination = startAddressPointer + i;
             memcpy(destination, patchCode.code, patchCode.codeSize);
             numberOfFounds++;

@@ -5,6 +5,7 @@
 #include <ctrcommon/input.hpp>
 #include <stdio.h>
 #include <string.h>
+
 //Application Constands 
 static const std::string applicationFolder = "sdmc:/fmp/";
 

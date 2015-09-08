@@ -159,6 +159,7 @@ void createDefaultCollections()
     menuPatch->startAddressGlobal = 0x26960000;
     menuPatch->searchAreaSize = 0x001A0000;
     menuPatch->numberOfReplacements = 0x01;
+    menuPatch->patchOffset = 0;
 
     memcpy(menuPatch->binaryData, menuBytes, sizeof(menuBytes));
     
@@ -193,6 +194,7 @@ void createDefaultCollections()
     nsPatch->startAddressGlobal = 0x26A00000;
     nsPatch->searchAreaSize = 0x00100000;
     nsPatch->numberOfReplacements = 0x02;
+    nsPatch->patchOffset = 0;
 
     memcpy(nsPatch->binaryData, nsBytes, sizeof(nsBytes));
     
