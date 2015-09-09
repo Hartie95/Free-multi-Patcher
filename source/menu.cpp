@@ -2,7 +2,6 @@
 #include <ctrcommon/gpu.hpp>
 
 #include "menu.h"
-#include "patches.h"
 #include "workaround.h"
 
 using namespace std;

@@ -1,27 +1,12 @@
 #pragma once
 
 #include <3ds.h>
-#include "constants.h"
-#include "patches.h"
 #include <vector>
 
-void createDefaultCollections();
+#include "patches.h"
+#include "binaryLayouts.h"
 
-typedef struct patchCollectionStruct
-{
-    u8   version;
-    u32   collectionNameSize;
-    u32   descriptionSize;
-    u32   numberOfPatches;
-    u32   processType;
-    kernelVersion     minKernelVersion;
-    kernelVersion     maxKernelVersion;
-    firmwareVersion   minFirmwareVersion;
-    firmwareVersion   maxFirmwareVersion;
-    regions regionsSupported;
-    nands   nandCompability;
-    char    binaryData[];
-} binPatchCollection;
+void createDefaultCollections();
 
 class PatchCollection
 {

@@ -5,7 +5,6 @@
 #include <3ds.h>
 #include <ctrcommon/input.hpp>
 #include <ctrcommon/service.hpp>
-#include "constants.h"
 #include <stdio.h>
 #include <vector>
 

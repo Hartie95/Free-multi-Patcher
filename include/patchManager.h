@@ -10,6 +10,9 @@
 class PatchManager
 {
 private:
+    std::vector<Patch*> loadedPatches;
+    std::vector<PatchCollection*> loadedCollections;
+
     bool isType(struct dirent* file, std::string extension);
     void* loadFile(FILE* file, size_t minSize);
     bool isPatch(struct dirent* file);
@@ -18,10 +21,12 @@ private:
     void applyPatches(std::vector<Patch*>* patchList);
     int findAndReplaceCode(Patch* _patch);
     void replaceCodeAt(Patch* _patch);
-    void findAndRepalaceString(Patch* _patch);
-    void* getProcessAddress(u32 startAddress, u32 processNameSize, const char* processName);
+    void usePointerAndReplaceCode(Patch* _patch);
+    void findAndReplaceString(Patch* _patch);
+    void replaceStringAt(Patch* _patch);
+    void usePointerAndReplaceString(Patch* _patch);
 
-    
+    void* getProcessAddress(u32 startAddress, u32 processNameSize, const char* processName);
     void* getProcessAddress(u32 startAddress, u32 processNameSize, char* processName);
 
     bool checkCompatibility(Patch* _patch);
@@ -34,7 +39,6 @@ public:
     void checkPatchFolder();
     void loadPatchFiles();
     int createPatchPage(MenuManager* menuManager);
-
 
     binPatch* loadPatch(FILE* file);
     binPatchCollection* loadCollection(FILE* file);

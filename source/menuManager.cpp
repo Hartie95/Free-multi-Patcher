@@ -3,10 +3,9 @@
 
 #include "menuManager.h"
 #include "patchManager.h"
-#include "Kernel11.h"
+#include "constants.h"
 
 using namespace std;
-
 
 MenuManager::MenuManager()
 {
@@ -120,8 +119,8 @@ string checkFirmwareVersion()
 {
     u32 firmware = osGetFirmVersion();
     std::stringstream stream;
-    stream << "uk";
-    stream << ((firmware)& 0xff);
+    /*stream << "uk";
+    stream << ((firmware)& 0xff);*/
     stream << "fw: ";
     stream << GET_VERSION_MAJOR(firmware);
     stream << ".";
@@ -137,8 +136,8 @@ string checkKernelVersion()
     u32 returnValue = osGetKernelVersion();
     kernelVersion* firmware = (kernelVersion*)&returnValue;
     std::stringstream stream;
-    stream << "uk";
-    stream << (u32)firmware->unknown;
+    /*stream << "uk";
+    stream << (u32)firmware->unknown;*/
     stream << "kernel: ";
     stream << (u32)firmware->major;
     stream << ".";                       
@@ -151,7 +150,7 @@ string checkKernelVersion()
 
 void MenuManager::drowTop()
 {
-    string debugOutput = "Model: " + getModel() + checkKernelVersion() + checkFirmwareVersion();
+    string debugOutput = "Model: " + getModel() + checkKernelVersion();// +checkFirmwareVersion();
 	const string title  = "Free Multi Patcher by hartie95";
 	const string credit = "based on Ygw eshop spoofer by felipejfc";
 	stringstream usageStream;

@@ -17,10 +17,6 @@
 
 using namespace std;
 
-//TODO move to class
-vector<Patch*> loadedPatches;
-vector<PatchCollection*> loadedCollections;
-string enabledPatches[10];
 
 PatchManager::PatchManager()
 {
@@ -164,9 +160,12 @@ int PatchManager::applyPatches()
     for (std::vector<PatchCollection*>::iterator it = loadedCollections.begin(); it != loadedCollections.end(); ++it)
     {
         currentCollection = (*it);
-        if (currentCollection->isEnabled()&&checkCompatibility(currentCollection))
+        if (currentCollection != nullptr)
         {
-            applyPatches(currentCollection->getAllPatches());
+            if (currentCollection->isEnabled() && checkCompatibility(currentCollection))
+            {
+                applyPatches(currentCollection->getAllPatches());
+            }
         }
     }
 
@@ -181,11 +180,36 @@ void PatchManager::applyPatches(vector<Patch*>* patchList)
     for (std::vector<Patch*>::iterator it = patchList->begin(); it != patchList->end(); ++it)
     {
         currentPatch = (*it);
-        if (currentPatch->isEnabled())
+        if (currentPatch != nullptr)
         {
-            if (checkCompatibility(currentPatch))
+            if (currentPatch->isEnabled())
             {
-                findAndReplaceCode(currentPatch);
+                if (checkCompatibility(currentPatch))
+                {
+                    switch (currentPatch->getPatchType())
+                    {
+                    case 0:
+                        this->findAndReplaceCode(currentPatch);
+                        break;
+                    case 1:
+                        this->replaceCodeAt(currentPatch);
+                        break;
+                    case 2:
+                        this->usePointerAndReplaceCode(currentPatch);
+                        break;
+                    case 3:
+                        this->findAndReplaceString(currentPatch);
+                        break;
+                    case 4:
+                        this->replaceStringAt(currentPatch);
+                        break;
+                    case 5:
+                        this->usePointerAndReplaceString(currentPatch);
+                        break;
+                    default:
+                        break;
+                    }
+                }
             }
         }
     }
@@ -264,7 +288,38 @@ void PatchManager::replaceCodeAt(Patch* _patch)
     return;
 }
 
-void PatchManager::findAndRepalaceString(Patch* _patch)
+void PatchManager::usePointerAndReplaceCode(Patch* _patch)
+{
+    const u32 pointerAddress = _patch->getStartAddressProcess();
+
+    const char* processName = _patch->getProcessName().c_str();
+    u32 processNameSize = _patch->getProcessName().size();
+
+    code patchCode = _patch->getPatchCode();
+    u32 internalAddress = *(u32 *)getProcessAddress(pointerAddress, processNameSize, processName);
+    u8 * destinationPointer = (u8 *)getProcessAddress(internalAddress, processNameSize, processName);
+    if (destinationPointer == nullptr)
+        return;
+
+    memcpy(destinationPointer, patchCode.code, patchCode.codeSize);
+
+    return;
+}
+
+void* stringcpy(void* destination, void* string, size_t stringSize, u32 offset)
+{
+    u8* destinationByte = (u8*)destination;
+    u8* stringByte = (u8*)destination;
+    for (u32 i = 0; i < stringSize;i++)
+    {
+        *(destinationByte) = *stringByte;
+        stringByte++;
+        destinationByte += 1 + offset;
+    }
+    return destination;
+}
+
+void PatchManager::findAndReplaceString(Patch* _patch)
 {
     u32 numberOfReplaces = _patch->getNumberOfReplacements(); 
     u32 stringCharacterOffset = _patch->getPatchOffset();
@@ -298,10 +353,49 @@ void PatchManager::findAndRepalaceString(Patch* _patch)
         {
             //Apply patches, if the addresses was found  /*TODO*/
             destination = startAddressPointer + i;
-            memcpy(destination, patchCode.code, patchCode.codeSize);
+            stringcpy(destination, patchCode.code, patchCode.codeSize,stringCharacterOffset);
             numberOfFounds++;
         }
     }
+    return;
+}
+
+void PatchManager::replaceStringAt(Patch* _patch)
+{
+    u32 stringCharacterOffset = _patch->getPatchOffset();
+    const u32 destination = _patch->getStartAddressProcess();
+
+    const char* processName = _patch->getProcessName().c_str();
+    u32 processNameSize = _patch->getProcessName().size();
+
+    code patchCode = _patch->getPatchCode();
+
+    u8 * destinationPointer = (u8 *)getProcessAddress(destination, processNameSize, processName);
+    if (destinationPointer == nullptr)
+        return;
+
+    stringcpy(destinationPointer, patchCode.code, patchCode.codeSize, stringCharacterOffset);
+
+    return;
+}
+
+
+void PatchManager::usePointerAndReplaceString(Patch* _patch)
+{
+    u32 stringCharacterOffset = _patch->getPatchOffset();
+    const u32 pointerAddress = _patch->getStartAddressProcess();
+
+    const char* processName = _patch->getProcessName().c_str();
+    u32 processNameSize = _patch->getProcessName().size();
+
+    code patchCode = _patch->getPatchCode();
+    u32 internalAddress = *(u32 *)getProcessAddress(pointerAddress, processNameSize, processName);
+    u8 * destinationPointer = (u8 *)getProcessAddress(internalAddress, processNameSize, processName);
+    if (destinationPointer == nullptr)
+        return;
+
+    stringcpy(destinationPointer, patchCode.code, patchCode.codeSize, stringCharacterOffset);
+
     return;
 }
 

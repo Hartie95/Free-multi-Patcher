@@ -2,7 +2,7 @@
 
 #include <3ds.h>
 
-#include <ctrcommon/input.hpp>
+#include <string>
 #include <stdio.h>
 #include <string.h>
 
@@ -16,7 +16,8 @@ static const std::string patchCollectionExtension = ".collection";
 static const std::string settingsFolder=applicationFolder+"settings/";
 static const std::string settingsFileName="settings.cfg";
 
-static const u32 version=0x006020;
+static const std::string versionCheckUrl = "http://fmp.hartie95.de/version.txt";
+static const u32 version=0x006025;
 
 //System Contands
 typedef struct kernelVersionStruct

@@ -11,7 +11,7 @@ using namespace std;
 binPatch* loadPatch(void* ptr)
 {
     binPatch* loadedPatch = nullptr;
-    if (ptr != NULL&& ptr!=nullptr)
+    if (ptr != NULL && ptr!=nullptr)
     {
         u32 size = ((binPatch*)ptr)->patchSize;
         if (size < sizeof(binPatch))
@@ -158,6 +158,7 @@ void createDefaultCollections()
     menuPatch->startAddressProcess = 0x00100000;
     menuPatch->startAddressGlobal = 0x26960000;
     menuPatch->searchAreaSize = 0x001A0000;
+    menuPatch->patchOffset = 0x00;
     menuPatch->numberOfReplacements = 0x01;
     menuPatch->patchOffset = 0;
 
@@ -190,6 +191,7 @@ void createDefaultCollections()
     nsPatch->regionsSupported = { 1, 1, 1, 1, 1, 1, 1, 0 };
     nsPatch->nandCompability = { 1, 1, 0 };
     nsPatch->patchType = 0x00;
+    nsPatch->patchOffset = 0x00;
     nsPatch->startAddressProcess = 0x00018000;
     nsPatch->startAddressGlobal = 0x26A00000;
     nsPatch->searchAreaSize = 0x00100000;

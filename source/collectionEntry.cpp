@@ -1,5 +1,6 @@
 #include "collectionEntry.h"
 #include "menu.h"
+#include "patchEntry.h"
 
 using namespace std;
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "patchEntry.h"
 #include "patchCollections.h"
+#include "defaultMenuEntrys.h"
 
 
 class CollectionEntry : protected YesNoMenuEntry, protected NavigationMenuEntry
