@@ -40,6 +40,7 @@ typedef struct patchStruct
     kernelVersion       maxKernelVersion;
     firmwareVersion     minFirmwareVersion;
     firmwareVersion     maxFirmwareVersion;
+    devices devicesSupported;
     regions regionsSupported;
     nands   nandCompability;
     u32      patchType;          //0->search code, 1->overwrite code, 2->search String, 3->overwrite string
@@ -65,6 +66,7 @@ typedef struct patchCollectionStruct
     kernelVersion     maxKernelVersion;
     firmwareVersion   minFirmwareVersion;
     firmwareVersion   maxFirmwareVersion;
+    devices devicesSupported;
     regions regionsSupported;
     nands   nandCompability;
     char    binaryData[];

@@ -28,6 +28,7 @@ private:
     kernelVersion     maxKernelVersion;
     firmwareVersion   minFirmwareVersion;
     firmwareVersion   maxFirmwareVersion;
+    devices devicesSupported;
     regions regionsSupported;
     nands   nandCompability;
 
@@ -51,6 +52,7 @@ public:
 
     kernelVersion     getMinKernelVersion();
     kernelVersion     getMaxKernelVersion();
+    devices getDevicesSupported();
     regions getRegionsSupported();
     nands   getNandCompability();
 

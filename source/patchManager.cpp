@@ -17,6 +17,25 @@
 
 using namespace std;
 
+void* stringcpy(void* destination, void* string, size_t stringSize, u32 offset)
+{
+    if (destination == nullptr || string == nullptr)
+        return nullptr;
+
+    if (stringSize == 0)
+        return destination;
+
+    u8* destinationByte = (u8*)destination;
+    u8* stringByte = (u8*)string;
+
+    for (u32 i = 0; i < stringSize; i++)
+    {
+        *(destinationByte) = *stringByte;
+        stringByte++;
+        destinationByte += 1 + offset;
+    }
+    return destination;
+}
 
 PatchManager::PatchManager()
 {
@@ -160,13 +179,14 @@ int PatchManager::applyPatches()
     for (std::vector<PatchCollection*>::iterator it = loadedCollections.begin(); it != loadedCollections.end(); ++it)
     {
         currentCollection = (*it);
-        if (currentCollection != nullptr)
-        {
-            if (currentCollection->isEnabled() && checkCompatibility(currentCollection))
-            {
-                applyPatches(currentCollection->getAllPatches());
-            }
-        }
+        if (currentCollection == nullptr)
+            continue;
+        
+        if (!currentCollection->isEnabled() || !checkCompatibility(currentCollection))
+            continue;
+
+        vector<Patch*>* patchList = currentCollection->getAllPatches();
+        applyPatches(patchList);
     }
 
     applyPatches(&loadedPatches);
@@ -176,48 +196,43 @@ int PatchManager::applyPatches()
 
 void PatchManager::applyPatches(vector<Patch*>* patchList)
 {
+    if (patchList == nullptr)
+        return;
+
     Patch* currentPatch = nullptr;
     for (std::vector<Patch*>::iterator it = patchList->begin(); it != patchList->end(); ++it)
     {
         currentPatch = (*it);
-        if (currentPatch != nullptr)
+        if (currentPatch == nullptr || currentPatch==NULL)
+            continue;
+        
+        if (!currentPatch->isEnabled() || !checkCompatibility(currentPatch))
+            continue;
+
+        switch (currentPatch->getPatchType())
         {
-            if (currentPatch->isEnabled())
-            {
-                if (checkCompatibility(currentPatch))
-                {
-                    switch (currentPatch->getPatchType())
-                    {
-                    case 0:
-                        this->findAndReplaceCode(currentPatch);
-                        break;
-                    case 1:
-                        this->replaceCodeAt(currentPatch);
-                        break;
-                    case 2:
-                        this->usePointerAndReplaceCode(currentPatch);
-                        break;
-                    case 3:
-                        this->findAndReplaceString(currentPatch);
-                        break;
-                    case 4:
-                        this->replaceStringAt(currentPatch);
-                        break;
-                    case 5:
-                        this->usePointerAndReplaceString(currentPatch);
-                        break;
-                    default:
-                        break;
-                    }
-                }
-            }
+        case 0:
+            this->findAndReplaceCode(currentPatch);
+            break;
+        case 1:
+            this->replaceCodeAt(currentPatch);
+            break;
+        case 2:
+            this->usePointerAndReplaceCode(currentPatch);
+            break;
+        case 3:
+            this->findAndReplaceString(currentPatch);
+            break;
+        case 4:
+            this->replaceStringAt(currentPatch);
+            break;
+        case 5:
+            this->usePointerAndReplaceString(currentPatch);
+            break;
+        default:
+            break;
         }
     }
-}
-
-int PatchManager::getNumberLoadedPatches()
-{
-    return loadedPatches.size();
 }
 
 void* PatchManager::getProcessAddress(u32 startAddress, u32 processNameSize, const char* processName)
@@ -229,28 +244,33 @@ void* PatchManager::getProcessAddress(u32 startAddress, u32 processNameSize, con
     return (void*) FindCodeOffsetKAddr(code_set, startAddress);
 }
 
-int PatchManager::findAndReplaceCode(Patch* _patch)
+void PatchManager::findAndReplaceCode(Patch* _patch)
 {
+    if (_patch == nullptr || _patch == NULL)
+        return;
+
     u32 numberOfReplaces = _patch->getNumberOfReplacements();
     u32 codeShift = _patch->getPatchOffset();
 
-    const u32 startAddress = _patch->getStartAddressProcess();
-    const u32 area = _patch->getSearchAreaSize();  
+    u32 area = _patch->getSearchAreaSize();  
 
-    const char* processName = _patch->getProcessName().c_str();
-    u32 processNameSize = _patch->getProcessName().size();
+    string processName = _patch->getProcessName();
 
     code originalCode = _patch->getOriginalCode();
     code patchCode = _patch->getPatchCode();
     
-
-    u8 * startAddressPointer = (u8 *)getProcessAddress(startAddress, processNameSize, processName);
+    if (numberOfReplaces<1 || area<1 || originalCode.codeSize < 1 || patchCode.codeSize <1)
+        return;
+    
+    u8 * startAddressPointer = (u8 *)getProcessAddress(_patch->getStartAddressProcess(), processName.size(), processName.c_str());
+    
     if(startAddressPointer==nullptr)
-        return 1;
+        return;
+    
     u8 * destination=nullptr;
     u32 numberOfFounds=0;
     
-    for(u32 i = 0; i < area && numberOfFounds<=numberOfReplaces; i+=4)
+    for(u32 i = 0; i < area && numberOfFounds<numberOfReplaces; i+=4)
     {  
         //check for the original code position
         bool found=true;
@@ -263,11 +283,11 @@ int PatchManager::findAndReplaceCode(Patch* _patch)
         {    
             //Apply patches, if the addresses was found  
             destination = startAddressPointer + i + codeShift;
-            memcpy(destination, patchCode.code, patchCode.codeSize);
+            //memcpy(destination, patchCode.code, patchCode.codeSize);
+            stringcpy(destination, patchCode.code, patchCode.codeSize,0);
             numberOfFounds++;
         }  
-    }  
-    return 0;
+    }
 }
 
 void PatchManager::replaceCodeAt(Patch* _patch)
@@ -304,19 +324,6 @@ void PatchManager::usePointerAndReplaceCode(Patch* _patch)
     memcpy(destinationPointer, patchCode.code, patchCode.codeSize);
 
     return;
-}
-
-void* stringcpy(void* destination, void* string, size_t stringSize, u32 offset)
-{
-    u8* destinationByte = (u8*)destination;
-    u8* stringByte = (u8*)destination;
-    for (u32 i = 0; i < stringSize;i++)
-    {
-        *(destinationByte) = *stringByte;
-        stringByte++;
-        destinationByte += 1 + offset;
-    }
-    return destination;
 }
 
 void PatchManager::findAndReplaceString(Patch* _patch)
@@ -404,20 +411,24 @@ void PatchManager::usePointerAndReplaceString(Patch* _patch)
 bool ignoreFirmware = true;
 bool ignoreKernel = true;
 bool ignoreRegion = true;
+bool ignoreDeviceType = true;
 bool ignoreFirmwareCollection = true;
 bool ignoreKernelCollection = true;
 bool ignoreRegionCollection = true;
+bool ignoreDeviceTypeCollection = true;
 
 bool PatchManager::checkCompatibility(Patch* _patch)
 {
     if (_patch == nullptr)
         return false;
 
+    bool compatibleDevice = isDeviceTypeSupported(_patch->getDevicesSupported());
     bool compatibleFirmware = true;
     bool compatibleKernel = checkKernelVersion(_patch->getMinKernelVersion(), _patch->getMaxKernelVersion());
     bool compatibleRegion = true;
 
-    bool compatible = (compatibleFirmware || ignoreFirmware)
+    bool compatible = (compatibleDevice || ignoreDeviceType)
+        && (compatibleFirmware || ignoreFirmware)
         && (compatibleKernel || ignoreKernel)
         && (compatibleRegion || ignoreRegion);
 
@@ -429,47 +440,87 @@ bool PatchManager::checkCompatibility(PatchCollection* _collection)
     if (_collection == nullptr)
         return false;
 
+    bool compatibleDevice = isDeviceTypeSupported(_collection->getDevicesSupported());
     bool compatibleFirmware = true;
     bool compatibleKernel = checkKernelVersion(_collection->getMinKernelVersion(), _collection->getMaxKernelVersion());
     bool compatibleRegion = true;
 
-    bool compatible = (compatibleFirmware || ignoreFirmware)
-        && (compatibleKernel || ignoreKernel)
-        && (compatibleRegion || ignoreRegion);
+    bool compatible = (compatibleDevice || ignoreDeviceTypeCollection)
+        && (compatibleFirmware || ignoreFirmwareCollection)
+        && (compatibleKernel || ignoreKernelCollection)
+        && (compatibleRegion || ignoreRegionCollection);
 
     return compatible;
 }
 
+bool checkMin(u8 numbers[], u32 numbersSize, u8 minNumbers[], u32 minNumbersSize)
+{
+    if (numbersSize != minNumbersSize)
+        return false;
+
+    if (numbers == nullptr || minNumbers == nullptr)
+        return false;
+
+    for (u32 i = 0; i < numbersSize;i++)
+    {
+        if (numbers[i] > minNumbers[i])
+            return true;
+        if (numbers[i] < minNumbers[i])
+            return false;
+    }
+    return true;
+}
+
+bool checkMax(u8 numbers[], u32 numbersSize, u8 maxNumbers[], u32 maxNumbersSize)
+{
+    if (numbersSize != maxNumbersSize)
+        return false;
+
+    if (numbers == nullptr || maxNumbers == nullptr)
+        return false;
+
+    for (u32 i = 0; i < numbersSize; i++)
+    {
+        if (numbers[i] < maxNumbers[i])
+            return true;
+        if (numbers[i] > maxNumbers[i])
+            return false;
+    }
+    return true;
+}
+
 bool PatchManager::checkKernelVersion(kernelVersion min, kernelVersion max)
 {
-    u32 kernelValue = osGetKernelVersion();
-    bool minBool = false;
-    bool maxBool = false;
-    kernelVersion* kernel = (kernelVersion*)&kernelValue;
-    if (min.major < kernel->major)
-        minBool = true;
-    else if (min.major == kernel->major)
-    {
-        if (min.minor < kernel->minor)
-            minBool = true;
-        else if (min.minor == kernel->minor)
-        {
-            if (min.revision <= kernel->revision)
-                minBool = true;
-        }
-    }
-    if (max.major > kernel->major)
-        maxBool = true;
-    else if (max.major == kernel->major)
-    {
-        if (max.minor > kernel->minor)
-            maxBool = true;
-        else if (max.minor == kernel->minor)
-        {
-            if (max.revision >= kernel->revision)
-                maxBool = true;
-        }
+    u8 kernelVersionArray[3] = { kernelversion.major, kernelversion.minor, kernelversion.revision};
+    u8 minVersionArray[3] = { min.major, min.minor, min.revision };
+    u8 maxVersionArray[3] = { max.major, max.minor, max.revision };
+    return checkMin(kernelVersionArray, 3, minVersionArray, 3) && checkMax(kernelVersionArray, 3, maxVersionArray, 3);
+    
+}
 
+
+bool PatchManager::isDeviceTypeSupported(devices device)
+{
+    bool supported = false;
+    switch (modelID)
+    {
+        case 0:
+            supported = device.old3DS;
+            break;
+        case 1:
+            supported = device.old3DSXL;
+            break;
+        case 3:
+            supported = device.old2DS;
+            break;
+        case 2:
+            supported = device.new3DS;
+            break;
+        case 4:
+            supported = device.new3DSXL;
+            break;
+        default:
+            break;
     }
-    return (minBool && maxBool);
+    return supported;
 }

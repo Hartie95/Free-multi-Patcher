@@ -21,19 +21,45 @@ int applyPatches()
     return patchManager->applyPatches();
 }
 
+int init(int argc)
+{
+    if (!platformInit(argc)) {
+        return 1;
+    }
+    httpcInit();
+    newsInit();
+    initCfgu();
+
+    SaveVersionConstants();
+
+    CFGU_GetSystemModel(&modelID);
+
+    u32 kernelValue = osGetKernelVersion();
+    kernelversion = *(kernelVersion*)&kernelValue;
+    
+    return 0;
+}
+
+int cleanup()
+{
+    HB_FlushInvalidateCache(); // Just to be sure!
+
+    httpcExit();
+    newsExit();
+    exitCfgu();
+
+    platformCleanup();
+
+    return 0;
+}
 
 
 int main(int argc, char **argv) {
-  if(!platformInit(argc)) {
+  
+  if(init(argc)!=0) {
     return 0;
   }
-
-  httpcInit();
-  newsInit();
-  initCfgu();
-
-  SaveVersionConstants();
-
+  
   //loadSettings(); 
    
   short exitLoop=false;
@@ -59,12 +85,6 @@ int main(int argc, char **argv) {
     menuManager->drawMenu();
   }
 
-  HB_FlushInvalidateCache(); // Just to be sure!
   
-  httpcExit();
-  newsExit();
-  exitCfgu();
-
-  platformCleanup();
   return 0;  
 }

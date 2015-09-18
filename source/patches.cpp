@@ -20,6 +20,7 @@ Patch::Patch(binPatch *_patch)
     this->maxKernelVersion = _patch->maxKernelVersion;
     this->minFirmwareVersion = _patch->minFirmwareVersion;
     this->maxFirmwareVersion = _patch->maxFirmwareVersion;
+    this->devicesSupported = _patch->devicesSupported;
     this->regionsSupported = _patch->regionsSupported;
     this->nandCompability = _patch->nandCompability;
 
@@ -74,6 +75,11 @@ kernelVersion Patch::getMinKernelVersion()
 kernelVersion Patch::getMaxKernelVersion()
 {
     return this->maxKernelVersion;
+}
+
+devices Patch::getDevicesSupported()
+{
+    return this->devicesSupported;
 }
 
 regions Patch::getRegionsSupported()
@@ -235,9 +241,11 @@ void createDefaultPatches()
     nimSpoofPatch->processType          = 0x01;
     nimSpoofPatch->minKernelVersion     = {0x00, 0x00, 0x00, 0x00};
     nimSpoofPatch->maxKernelVersion     = {0xFF, 0xFF, 0xFF, 0xFF};
-    nimSpoofPatch->minFirmwareVersion = { 9, 0, 0, 20 };
-    nimSpoofPatch->maxFirmwareVersion = { 9, 9, 0, 26 };
+    nimSpoofPatch->minFirmwareVersion   = { 9, 0, 0, 20 };
+    nimSpoofPatch->maxFirmwareVersion   = { 9, 9, 0, 26 };
+    nimSpoofPatch->devicesSupported     = {1,1,1,1,1,0};
     nimSpoofPatch->regionsSupported     = {1,1,1,1,1,1,1,0};
+    nimSpoofPatch->devicesSupported     = {1,1,1,1,1,0};
     nimSpoofPatch->nandCompability      = {1,1,0};
     nimSpoofPatch->patchType            = 0x00;
     nimSpoofPatch->startAddressProcess  = 0x00001000;
@@ -251,10 +259,10 @@ void createDefaultPatches()
     string nimSpoofPatchFileName="nimSpoof"+patchExtension;
 
     filepath=patchesFolder+nimSpoofPatchFileName;
-    file = fopen(filepath.c_str(),"w"); 
+    file = fopen(filepath.c_str(),"wb"); 
     if (file == NULL) 
     {
-        file = fopen(filepath.c_str(),"c"); 
+        file = fopen(filepath.c_str(),"cb"); 
     }
     fwrite(nimSpoofPatch, 1, (nimSpoofSize), file);
     fclose(file);
@@ -282,8 +290,10 @@ void createDefaultPatches()
     nimUpdatePatch->processType          = 0x01;
     nimUpdatePatch->minKernelVersion     = {0x00, 0x00, 0x00, 0x00};
     nimUpdatePatch->maxKernelVersion     = {0xFF, 0xFF, 0xFF, 0xFF};
-    nimUpdatePatch->minFirmwareVersion = { 4, 0, 0, 0 };
-    nimUpdatePatch->maxFirmwareVersion = { 9, 9, 0, 255 };
+    nimUpdatePatch->minFirmwareVersion   = { 4, 0, 0, 0 };
+    nimUpdatePatch->maxFirmwareVersion   = { 9, 9, 0, 255 };
+    nimUpdatePatch->devicesSupported     = {1,1,1,1,1,0};
+    nimUpdatePatch->devicesSupported     = {1,1,1,1,1,0};
     nimUpdatePatch->regionsSupported     = {1,1,1,1,1,1,1,0};
     nimUpdatePatch->nandCompability      = {1,1,0};
     nimUpdatePatch->patchType            = 0x00;
@@ -298,10 +308,10 @@ void createDefaultPatches()
     string nimUpdatePatchFileName="nimUpdate"+patchExtension;
 
     filepath=patchesFolder+nimUpdatePatchFileName;
-    file = fopen(filepath.c_str(),"w"); 
+    file = fopen(filepath.c_str(),"wb"); 
     if (file == NULL) 
     {
-        file = fopen(filepath.c_str(),"c"); 
+        file = fopen(filepath.c_str(),"cb"); 
     }
     fwrite(nimUpdatePatch, 1, (nimUpdateSize), file);
     fclose(file);

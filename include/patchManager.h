@@ -19,7 +19,7 @@ private:
     bool isCollection(struct dirent* file);
 
     void applyPatches(std::vector<Patch*>* patchList);
-    int findAndReplaceCode(Patch* _patch);
+    void findAndReplaceCode(Patch* _patch);
     void replaceCodeAt(Patch* _patch);
     void usePointerAndReplaceCode(Patch* _patch);
     void findAndReplaceString(Patch* _patch);
@@ -33,7 +33,8 @@ private:
     bool checkCompatibility(PatchCollection* _collection);
 
     bool checkKernelVersion(kernelVersion min, kernelVersion max);
-protected:
+    bool isDeviceTypeSupported(devices device);
+
 public:
     PatchManager();
     void checkPatchFolder();
@@ -43,7 +44,5 @@ public:
     binPatch* loadPatch(FILE* file);
     binPatchCollection* loadCollection(FILE* file);
 
-    int  applyPatches();
-
-    int getNumberLoadedPatches();   
+    int  applyPatches(); 
 };

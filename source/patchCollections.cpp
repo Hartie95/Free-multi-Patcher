@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include <ctrcommon/fs.hpp> 
-//#include <sys/stat.h>
+#include <ctrcommon/fs.hpp>
 #include <stdlib.h>
 
 #include "patchCollections.h"
@@ -35,6 +34,7 @@ PatchCollection::PatchCollection(binPatchCollection* collection)
     this->maxKernelVersion = collection->maxKernelVersion;
     this->minFirmwareVersion = collection->minFirmwareVersion;
     this->maxFirmwareVersion = collection->maxFirmwareVersion;
+    this->devicesSupported = collection->devicesSupported;
     this->regionsSupported = collection->regionsSupported;
     this->nandCompability = collection->nandCompability;
 
@@ -86,6 +86,11 @@ kernelVersion PatchCollection::getMinKernelVersion()
 kernelVersion PatchCollection::getMaxKernelVersion()
 {
     return this->maxKernelVersion;
+}
+
+devices PatchCollection::getDevicesSupported()
+{
+    return this->devicesSupported;
 }
 
 regions PatchCollection::getRegionsSupported()
@@ -152,7 +157,8 @@ void createDefaultCollections()
     menuPatch->maxKernelVersion = { 0xFF, 0xFF, 0xFF, 0xFF };
     menuPatch->minFirmwareVersion = { 4, 0, 0, 0 };
     menuPatch->maxFirmwareVersion = { 9, 9, 0, 255 };
-    menuPatch->regionsSupported = { 1, 1, 1, 1, 1, 1, 1, 0 };
+    menuPatch->devicesSupported = {1,1,1,1,1,0};
+    menuPatch->regionsSupported = {1,1,1,1,1,1,1,0};
     menuPatch->nandCompability = { 1, 1, 0 };
     menuPatch->patchType = 0x00;
     menuPatch->startAddressProcess = 0x00100000;
@@ -188,13 +194,14 @@ void createDefaultCollections()
     nsPatch->maxKernelVersion = { 255, 1, 50, 2 };
     nsPatch->minFirmwareVersion = { 0x00, 0x00, 0x00, 0x00 };
     nsPatch->maxFirmwareVersion = { 0xFF, 0xFF, 0xFF, 0xFF };
+    nsPatch->devicesSupported = { 1, 1, 1, 1, 1, 0 };
     nsPatch->regionsSupported = { 1, 1, 1, 1, 1, 1, 1, 0 };
     nsPatch->nandCompability = { 1, 1, 0 };
     nsPatch->patchType = 0x00;
     nsPatch->patchOffset = 0x00;
     nsPatch->startAddressProcess = 0x00018000;
     nsPatch->startAddressGlobal = 0x26A00000;
-    nsPatch->searchAreaSize = 0x00100000;
+    nsPatch->searchAreaSize = 0x00050000;
     nsPatch->numberOfReplacements = 0x02;
     nsPatch->patchOffset = 0;
 
@@ -216,6 +223,7 @@ void createDefaultCollections()
     regionfree->maxKernelVersion = { 255, 1, 50, 2 };
     regionfree->minFirmwareVersion = { 4, 0, 0, 0 };
     regionfree->maxFirmwareVersion = { 9, 9, 0, 255 };
+    regionfree->devicesSupported = { 1, 1, 1, 1, 1, 0 };
     regionfree->regionsSupported = { 1, 1, 1, 1, 1, 1, 1, 0 };
     regionfree->nandCompability = { 1, 1, 0 };
 

@@ -9,6 +9,9 @@ u32 kproc_num   = 0;
 u32 kproc_codeset_offset = 0;
 u32 kproc_pid_offset     = 0;
 
+u8 modelID=255;
+kernelVersion kernelversion = { 0, 0, 0, 0 };
+
 void FindKProcStart()
 {
     // Get the vtable* of the current application's KProcess.

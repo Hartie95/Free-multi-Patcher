@@ -95,21 +95,23 @@ void MenuManager::drawMenu()
 
 string getModel()
 {
-    u8 modelID = 0;
-    CFGU_GetSystemModel(&modelID);
     string model = "";
     switch (modelID)
     {
     case 0:
-    case 1:
         model = "old 3DS";
+        break;
+    case 1:
+        model = "old 3DS XL";
         break;
     case 3:
         model = "2DS";
         break;
     case 2:
-    case 4:
         model = "new 3DS";
+        break;
+    case 4:
+        model = "new 3DS XL";
         break;
     }
     return model + "\n";
@@ -133,17 +135,15 @@ string checkFirmwareVersion()
 
 string checkKernelVersion()
 {
-    u32 returnValue = osGetKernelVersion();
-    kernelVersion* firmware = (kernelVersion*)&returnValue;
     std::stringstream stream;
     /*stream << "uk";
-    stream << (u32)firmware->unknown;*/
+    stream << (u32)kernelversion.unknown;*/
     stream << "kernel: ";
-    stream << (u32)firmware->major;
+    stream << (u32)kernelversion.major;
     stream << ".";                       
-    stream << (u32)firmware->minor;
+    stream << (u32)kernelversion.minor;
     stream << "-";
-    stream << (u32)firmware->revision;
+    stream << (u32)kernelversion.revision;
     std::string result(stream.str());
     return result+"\n";
 }
