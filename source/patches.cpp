@@ -24,11 +24,12 @@ Patch::Patch(binPatch *_patch)
     this->regionsSupported = _patch->regionsSupported;
     this->nandCompability = _patch->nandCompability;
 
-    patchType = _patch->patchType;
-    startAddressProcess = _patch->startAddressProcess;
-    startAddressGlobal = _patch->startAddressGlobal;
-    searchAreaSize = _patch->searchAreaSize;
-    numberOfReplacements = _patch->numberOfReplacements;
+    this->patchType = _patch->patchType;
+    this->startAddressProcess = _patch->startAddressProcess;
+    this->startAddressGlobal = _patch->startAddressGlobal;
+    this->searchAreaSize = _patch->searchAreaSize;
+    this->numberOfReplacements = _patch->numberOfReplacements;
+    this->patchOffset = _patch->patchOffset;
 
     u32 originalcodeSize=_patch->originalcodeSize;
     u8* originalcode = (u8*) malloc(originalcodeSize);
@@ -314,5 +315,4 @@ void createDefaultPatches()
     fwrite(nimUpdatePatch, 1, (nimUpdateSize), file);
     fclose(file);
     free(nimUpdatePatch);
-
 }

@@ -12,7 +12,6 @@
 
 using namespace std;
 
-/*Todo  move update stuff to own class*/
 PatchManager* patchManager;
 MenuManager* menuManager;
 
@@ -48,6 +47,7 @@ int cleanup()
     newsExit();
     exitCfgu();
 
+
     platformCleanup();
 
     return 0;
@@ -55,37 +55,37 @@ int cleanup()
 
 
 int main(int argc, char **argv) {
-  
-  if(init(argc)!=0) {
+    if(init(argc)!=0) {
     return 0;
-  }
+    }
   
-  //loadSettings(); 
+    //loadSettings(); 
    
-  short exitLoop=false;
-  patchManager= new PatchManager();
-  menuManager = new MenuManager();
+    short exitLoop=false;
+    patchManager= new PatchManager();
+    menuManager = new MenuManager();
   
-  patchManager->createPatchPage(menuManager);
+    patchManager->createPatchPage(menuManager);
 
-  while(platformIsRunning()&&exitLoop==false) 
-  {
-    //Todo: replace with switch case
-    exitLoop = menuManager->ManageInput();
-
-    if(inputIsPressed(BUTTON_SELECT))
+    while(platformIsRunning()&&exitLoop==false) 
     {
-        checkForUpdate();
+        //Todo: replace with switch case
+        exitLoop = menuManager->ManageInput();
+
+        menuManager->drawMenu();
+
+        if(inputIsPressed(BUTTON_SELECT))
+        {
+            checkForUpdate();
+        }
+
+        if (inputIsPressed(BUTTON_START)) {
+            KernelBackdoor(&applyPatches);
+            exitLoop = true;
+        }
     }
 
-    if (inputIsPressed(BUTTON_START)) {
-        KernelBackdoor(&applyPatches);
-        exitLoop = true;
-    }
-    menuManager->drawMenu();
-  }
+    cleanup();
 
-  cleanup();
-
-  return 0;  
+    return 0;  
 }

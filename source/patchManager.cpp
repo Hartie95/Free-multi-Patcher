@@ -246,7 +246,7 @@ void* PatchManager::getProcessAddress(u32 startAddress, u32 processNameSize, con
 
 void PatchManager::findAndReplaceCode(Patch* _patch)
 {
-    if (_patch == nullptr || _patch == NULL)
+    if (_patch == nullptr)
         return;
 
     u32 numberOfReplaces = _patch->getNumberOfReplacements();
