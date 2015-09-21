@@ -43,11 +43,11 @@ typedef struct patchStruct
     devices devicesSupported;
     regions regionsSupported;
     nands   nandCompability;
-    u32      patchType;          //0->search code, 1->overwrite code, 2->search String, 3->overwrite string
+    u32     patchType;          //0->search code, 1->overwrite code, 2->search String, 3->overwrite string
     u32     startAddressProcess;
     u32     startAddressGlobal;
     u32     searchAreaSize;     //0 overwrite all apearences
-    u32     patchOffset;        //strings offset between each character, code offset wer to patch based on originalcode  
+    u32     patchOffset;        //strings offset between each character, code offset where to patch based on originalcode  
     u32     numberOfReplacements;
     char binaryData[];
 } binPatch;
