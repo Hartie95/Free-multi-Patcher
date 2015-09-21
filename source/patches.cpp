@@ -245,7 +245,6 @@ void createDefaultPatches()
     nimSpoofPatch->maxFirmwareVersion   = { 9, 9, 0, 26 };
     nimSpoofPatch->devicesSupported     = {1,1,1,1,1,0};
     nimSpoofPatch->regionsSupported     = {1,1,1,1,1,1,1,0};
-    nimSpoofPatch->devicesSupported     = {1,1,1,1,1,0};
     nimSpoofPatch->nandCompability      = {1,1,0};
     nimSpoofPatch->patchType            = 0x00;
     nimSpoofPatch->startAddressProcess  = 0x00001000;
@@ -292,7 +291,6 @@ void createDefaultPatches()
     nimUpdatePatch->maxKernelVersion     = {0xFF, 0xFF, 0xFF, 0xFF};
     nimUpdatePatch->minFirmwareVersion   = { 4, 0, 0, 0 };
     nimUpdatePatch->maxFirmwareVersion   = { 9, 9, 0, 255 };
-    nimUpdatePatch->devicesSupported     = {1,1,1,1,1,0};
     nimUpdatePatch->devicesSupported     = {1,1,1,1,1,0};
     nimUpdatePatch->regionsSupported     = {1,1,1,1,1,1,1,0};
     nimUpdatePatch->nandCompability      = {1,1,0};

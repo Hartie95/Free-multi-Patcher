@@ -85,6 +85,7 @@ int main(int argc, char **argv) {
     menuManager->drawMenu();
   }
 
-  
+  cleanup();
+
   return 0;  
 }

@@ -283,8 +283,7 @@ void PatchManager::findAndReplaceCode(Patch* _patch)
         {    
             //Apply patches, if the addresses was found  
             destination = startAddressPointer + i + codeShift;
-            //memcpy(destination, patchCode.code, patchCode.codeSize);
-            stringcpy(destination, patchCode.code, patchCode.codeSize,0);
+            memcpy(destination, patchCode.code, patchCode.codeSize);
             numberOfFounds++;
         }  
     }
