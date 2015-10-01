@@ -3,7 +3,7 @@
 
 #include "menuManager.h"
 #include "patchManager.h"
-#include "constants.h"
+#include "device.h"
 
 using namespace std;
 
@@ -96,7 +96,7 @@ void MenuManager::drawMenu()
 string getModel()
 {
     string model = "";
-    switch (modelID)
+    switch (device.modelID)
     {
     case 0:
         model = "old 3DS";
@@ -117,18 +117,51 @@ string getModel()
     return model + "\n";
 }
 
+string getRegion()
+{
+	string region = "";
+	switch (device.region)
+	{
+	case 0:
+		region = "J";
+		break;
+	case 1:
+		region = "U";
+		break;
+	case 2:
+		region = "E";
+		break;
+	case 3:
+		region = "AUS";
+		break;
+	case 4:
+		region = "C";
+		break;
+	case 5:
+		region = "K";
+		break;
+	case 6:
+		region = "T";
+		break;
+	default:
+		break;
+	}
+	return region;
+}
+
 string checkFirmwareVersion()
 {
-    u32 firmware = osGetFirmVersion();
     std::stringstream stream;
-    /*stream << "uk";
-    stream << ((firmware)& 0xff);*/
     stream << "fw: ";
-    stream << GET_VERSION_MAJOR(firmware);
+    stream << (u32)device.firmwareversion.major;
     stream << ".";
-    stream << GET_VERSION_MINOR(firmware);
-    stream << "-";
-    stream << GET_VERSION_REVISION(firmware);
+    stream << (u32)device.firmwareversion.minor;
+    stream << ".";
+    stream << (u32)device.firmwareversion.revision;
+	stream << "-";
+	stream << (u32)device.firmwareversion.nver;
+	stream << " ";
+	stream << getRegion();
     std::string result(stream.str());
     return result + "\n";
 }
@@ -139,18 +172,18 @@ string checkKernelVersion()
     /*stream << "uk";
     stream << (u32)kernelversion.unknown;*/
     stream << "kernel: ";
-    stream << (u32)kernelversion.major;
+    stream << (u32)device.kernelversion.major;
     stream << ".";                       
-    stream << (u32)kernelversion.minor;
+    stream << (u32)device.kernelversion.minor;
     stream << "-";
-    stream << (u32)kernelversion.revision;
+    stream << (u32)device.kernelversion.revision;
     std::string result(stream.str());
     return result+"\n";
 }
 
 void MenuManager::drowTop()
 {
-    string debugOutput = "Model: " + getModel() + checkKernelVersion();// +checkFirmwareVersion();
+    string debugOutput = "Model: " + getModel() + checkKernelVersion()+checkFirmwareVersion();// +checkFirmwareVersion();
 	const string title  = "Free Multi Patcher by hartie95";
 	const string credit = "based on Ygw eshop spoofer by felipejfc";
 	stringstream usageStream;

@@ -2,11 +2,12 @@
 
 #include <ctrcommon/input.hpp>
 #include <ctrcommon/platform.hpp>
-#include <ctrcommon/service.hpp>
+//#include <ctrcommon/service.hpp>
 
 #include "patchManager.h"
 #include "menuManager.h"
 #include "updater.h"
+#include "device.h"
 
 #include "kernel11.h"
 
@@ -20,6 +21,12 @@ int applyPatches()
     return patchManager->applyPatches();
 }
 
+int test()
+{
+	checkForUpdate();
+	return 0;
+}
+
 int init(int argc)
 {
     if (!platformInit(argc)) {
@@ -30,11 +37,7 @@ int init(int argc)
     initCfgu();
 
     SaveVersionConstants();
-
-    CFGU_GetSystemModel(&modelID);
-
-    u32 kernelValue = osGetKernelVersion();
-    kernelversion = *(kernelVersion*)&kernelValue;
+	initDeviceInformations();
     
     return 0;
 }
@@ -47,9 +50,7 @@ int cleanup()
     newsExit();
     exitCfgu();
 
-
     platformCleanup();
-
     return 0;
 }
 
@@ -76,7 +77,7 @@ int main(int argc, char **argv) {
 
         if(inputIsPressed(BUTTON_SELECT))
         {
-            checkForUpdate();
+			test();
         }
 
         if (inputIsPressed(BUTTON_START)) {

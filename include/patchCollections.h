@@ -16,8 +16,8 @@ private:
 
     kernelVersion     minKernelVersion;
     kernelVersion     maxKernelVersion;
-    firmwareVersion   minFirmwareVersion;
-    firmwareVersion   maxFirmwareVersion;
+	firmwareVersion   minFirmwareVersion;
+	firmwareVersion   maxFirmwareVersion;
     devices devicesSupported;
     regions regionsSupported;
     nands   nandCompability;
@@ -36,13 +36,13 @@ public:
 
     kernelVersion     getMinKernelVersion();
     kernelVersion     getMaxKernelVersion();
+	firmwareVersion     getMinFirmwareVersion();
+	firmwareVersion     getMaxFirmwareVersion();
     devices getDevicesSupported();
     regions getRegionsSupported();
     nands   getNandCompability();
 
-    u8      getPatchType();
     u32     getNumberOfPatches();
-    Patch*  getPatch(int position);
     std::vector<Patch*>* getAllPatches();
 
     bool    changeStatus();

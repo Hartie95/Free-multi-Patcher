@@ -5,6 +5,7 @@
 #include "patches.h"
 #include "patchCollections.h"
 #include "menuManager.h"
+#include "device.h"
 
 
 class PatchManager
@@ -33,7 +34,9 @@ private:
     bool checkCompatibility(PatchCollection* _collection);
 
     bool checkKernelVersion(kernelVersion min, kernelVersion max);
-    bool isDeviceTypeSupported(devices device);
+	bool checkFirmwareVersion(firmwareVersion min, firmwareVersion max);
+	bool isRegionSupported(regions _regions);
+    bool isDeviceTypeSupported(devices _devices);
 
 public:
     PatchManager();

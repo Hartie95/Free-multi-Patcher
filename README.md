@@ -12,4 +12,5 @@ It also allows other peoples to create, add and share own patches using the patc
 
 ### Credits
 * base application: 	[YGW Eshop Spoofer (Y a Gateway!?)](https://github.com/felipejfc/ygw-eshop-spoofer) by [felipejfc](https://github.com/felipejfc)
-* region free:		[rxtools](https://github.com/roxas75/rxTools) by [roxas](https://github.com/roxas75/rxTools)
+* region free:		[rxtools](https://github.com/roxas75/rxTools) by [roxas](https://github.com/roxas75)
+* CVer and NVER reading [3ds_homemenuhax](https://github.com/yellows8/3ds_homemenuhax) by [yellows8](https://github.com/yellows8)

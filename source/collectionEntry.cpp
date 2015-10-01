@@ -1,6 +1,7 @@
 #include "collectionEntry.h"
 #include "menu.h"
 #include "patchEntry.h"
+#include "../include/patchEntry.h"
 
 using namespace std;
 
@@ -15,12 +16,12 @@ CollectionEntry::CollectionEntry(PatchCollection* collection,MenuManagerM* manag
     this->menu = (MenuM*)new Menu((MenuManager*)this->manager,(Menu*)parentMenu);
     
     vector<Patch*>* collectionPatches = collection->getAllPatches();
-    Patch* currentPatch = nullptr;
-    PatchEntry* currentEntry = nullptr;
+    
+    
     for (std::vector<Patch*>::iterator it = collectionPatches->begin(); it != collectionPatches->end(); ++it)
     {
-        currentPatch = (*it);
-        currentEntry = new PatchEntry(currentPatch);
+        Patch* currentPatch = (*it);
+        PatchEntry* currentEntry = new PatchEntry(currentPatch);;
         ((Menu*)this->menu)->addEntry((MenuEntry*)currentEntry);
     }
 }

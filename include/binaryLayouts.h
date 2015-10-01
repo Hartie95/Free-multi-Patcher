@@ -2,21 +2,9 @@
 
 #include <3ds.h>
 #include "constants.h"
+#include "device.h"
 
 /*Patchlayout defined by https://github.com/hartmannaf/Free-multi-Patcher/wiki/patchlayout */
-
-//Australia is not used, instead it uses European region
-typedef struct regionsStruct
-{
-    u32 japan : 1;
-    u32 northAmerica : 1;
-    u32 europe : 1;
-    u32 australia : 1;
-    u32 china : 1;
-    u32 korea : 1;
-    u32 taiwan : 1;
-    u32 placeholder : 1;
-} regions;
 
 //placeholder for possible later types of emunand
 typedef struct nandTypesStruct

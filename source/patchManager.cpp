@@ -14,7 +14,6 @@
 #include "patchEntry.h"
 #include "collectionEntry.h"
 
-
 using namespace std;
 
 void* stringcpy(void* destination, void* string, size_t stringSize, u32 offset)
@@ -422,9 +421,9 @@ bool PatchManager::checkCompatibility(Patch* _patch)
         return false;
 
     bool compatibleDevice = isDeviceTypeSupported(_patch->getDevicesSupported());
-    bool compatibleFirmware = true;
+    bool compatibleFirmware = checkFirmwareVersion(_patch->getMinFirmwareVersion(), _patch->getMaxFirmwareVersion());
     bool compatibleKernel = checkKernelVersion(_patch->getMinKernelVersion(), _patch->getMaxKernelVersion());
-    bool compatibleRegion = true;
+    bool compatibleRegion = isRegionSupported(_patch->getRegionsSupported());
 
     bool compatible = (compatibleDevice || ignoreDeviceType)
         && (compatibleFirmware || ignoreFirmware)
@@ -440,9 +439,9 @@ bool PatchManager::checkCompatibility(PatchCollection* _collection)
         return false;
 
     bool compatibleDevice = isDeviceTypeSupported(_collection->getDevicesSupported());
-    bool compatibleFirmware = true;
+    bool compatibleFirmware = checkFirmwareVersion(_collection->getMinFirmwareVersion(), _collection->getMaxFirmwareVersion());
     bool compatibleKernel = checkKernelVersion(_collection->getMinKernelVersion(), _collection->getMaxKernelVersion());
-    bool compatibleRegion = true;
+    bool compatibleRegion = isRegionSupported(_collection->getRegionsSupported());
 
     bool compatible = (compatibleDevice || ignoreDeviceTypeCollection)
         && (compatibleFirmware || ignoreFirmwareCollection)
@@ -490,33 +489,75 @@ bool checkMax(u8 numbers[], u32 numbersSize, u8 maxNumbers[], u32 maxNumbersSize
 
 bool PatchManager::checkKernelVersion(kernelVersion min, kernelVersion max)
 {
-    u8 kernelVersionArray[3] = { kernelversion.major, kernelversion.minor, kernelversion.revision};
+    u8 kernelVersionArray[3] = { device.kernelversion.major, device.kernelversion.minor, device.kernelversion.revision};
     u8 minVersionArray[3] = { min.major, min.minor, min.revision };
     u8 maxVersionArray[3] = { max.major, max.minor, max.revision };
     return checkMin(kernelVersionArray, 3, minVersionArray, 3) && checkMax(kernelVersionArray, 3, maxVersionArray, 3);
     
 }
 
+bool PatchManager::checkFirmwareVersion(firmwareVersion min, firmwareVersion max)
+{
+	u8 cverVersionArray[3] = { device.firmwareversion.major, device.firmwareversion.minor, device.firmwareversion.revision };
+	u8 minVersionArray[3] = { min.major, min.minor, min.revision };
+	u8 maxVersionArray[3] = { max.major, max.minor, max.revision };
+	bool ret= checkMin(cverVersionArray, 3, minVersionArray, 3) && checkMax(cverVersionArray, 3, maxVersionArray, 3);
+	ret= ret&checkMin(&device.firmwareversion.nver, 1, &min.nver, 1) && checkMax(&device.firmwareversion.nver, 1, &max.nver, 1);
+	return ret;
+}
 
-bool PatchManager::isDeviceTypeSupported(devices device)
+bool PatchManager::isRegionSupported(regions _regions)
+{
+	bool supported = false;
+	switch (device.region)
+	{
+	case 0:
+		supported = _regions.japan;
+		break;
+	case 1:
+		supported = _regions.northAmerica;
+		break;
+	case 2:
+		supported = _regions.europe;
+		break;
+	case 3:
+		supported = _regions.australia;
+		break;
+	case 4:
+		supported = _regions.china;
+		break;
+	case 5:
+		supported = _regions.korea;
+		break;
+	case 6:
+		supported = _regions.taiwan;
+		break;
+	default:
+		break;
+	}
+	return supported;
+
+}
+
+bool PatchManager::isDeviceTypeSupported(devices _devices)
 {
     bool supported = false;
-    switch (modelID)
+    switch (device.modelID)
     {
         case 0:
-            supported = device.old3DS;
+            supported = _devices.old3DS;
             break;
         case 1:
-            supported = device.old3DSXL;
+            supported = _devices.old3DSXL;
             break;
         case 3:
-            supported = device.old2DS;
+            supported = _devices.old2DS;
             break;
         case 2:
-            supported = device.new3DS;
+            supported = _devices.new3DS;
             break;
         case 4:
-            supported = device.new3DSXL;
+            supported = _devices.new3DSXL;
             break;
         default:
             break;

@@ -52,6 +52,8 @@ public:
 
     kernelVersion     getMinKernelVersion();
     kernelVersion     getMaxKernelVersion();
+	firmwareVersion     getMinFirmwareVersion();
+	firmwareVersion     getMaxFirmwareVersion();
     devices getDevicesSupported();
     regions getRegionsSupported();
     nands   getNandCompability();

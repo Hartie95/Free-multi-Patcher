@@ -78,6 +78,16 @@ kernelVersion Patch::getMaxKernelVersion()
     return this->maxKernelVersion;
 }
 
+firmwareVersion Patch::getMinFirmwareVersion()
+{
+	return this->minFirmwareVersion;
+}
+
+firmwareVersion Patch::getMaxFirmwareVersion()
+{
+	return this->maxFirmwareVersion;
+}
+
 devices Patch::getDevicesSupported()
 {
     return this->devicesSupported;
