@@ -6,6 +6,7 @@
 #include "patchCollections.h"
 #include "menuManager.h"
 #include "device.h"
+#include "settings.h"
 
 
 class PatchManager
@@ -13,9 +14,9 @@ class PatchManager
 private:
     std::vector<Patch*> loadedPatches;
     std::vector<PatchCollection*> loadedCollections;
+	Settings* patchSettings;
 
     bool isType(struct dirent* file, std::string extension);
-    void* loadFile(FILE* file, size_t minSize);
     bool isPatch(struct dirent* file);
     bool isCollection(struct dirent* file);
 
@@ -47,5 +48,7 @@ public:
     binPatch* loadPatch(FILE* file);
     binPatchCollection* loadCollection(FILE* file);
 
-    int  applyPatches(); 
+    int applyPatches(); 
+	int saveSettings();
+	int loadSettings();
 };

@@ -112,8 +112,8 @@ void Menu::drawMenu()
     gpuViewport(BOTTOM_SCREEN, 0, 0, BOTTOM_WIDTH, BOTTOM_HEIGHT);
     gputOrtho(0, BOTTOM_WIDTH, 0, BOTTOM_HEIGHT, -1, 1);
     gpuClearColor(0xFF, 0xFF, 0xFF, 0xFF);
-    gputDrawString(menu, (gpuGetViewportWidth() ) / 8, (gpuGetViewportHeight() - gputGetStringHeight(menu, 8))/2 +50 , 8, 8, 0, 0, 0);     
-    gputDrawString(description, (gpuGetViewportWidth() - gputGetStringWidth(description, 8)) / 2, (gpuGetViewportHeight() - gputGetStringHeight(description, 8))/2 -75 , 8, 8, 0, 0, 0);     
+    gputDrawString(menu, 20, BOTTOM_HEIGHT-30-gputGetStringHeight(menu, 8) , 8, 8, 0, 0, 0);
+    gputDrawString(description, 30, 50-gputGetStringHeight(description, 8), 8, 8, 0, 0, 0);
 
     gpuFlushBuffer();
 

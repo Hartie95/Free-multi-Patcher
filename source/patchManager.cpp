@@ -13,8 +13,23 @@
 
 #include "patchEntry.h"
 #include "collectionEntry.h"
+#include "saveEntrys.h"
+
+#include "helpers.h"
 
 using namespace std;
+
+
+bool ignoreFirmware = false;
+bool ignoreKernel = false;
+bool ignoreRegion = false;
+bool ignoreDeviceType = false;
+bool ignoreFirmwareCollection = false;
+bool ignoreKernelCollection = false;
+bool ignoreRegionCollection = false;
+bool ignoreDeviceTypeCollection = false;
+
+const string patchcfgName = "patch";
 
 void* stringcpy(void* destination, void* string, size_t stringSize, u32 offset)
 {
@@ -38,10 +53,12 @@ void* stringcpy(void* destination, void* string, size_t stringSize, u32 offset)
 
 PatchManager::PatchManager()
 {
-    checkPatchFolder();
-    createDefaultPatches();
-    createDefaultCollections();
-    loadPatchFiles();
+	this->checkPatchFolder();
+	createDefaultPatches();
+	createDefaultCollections();
+	this->loadPatchFiles();
+	this->patchSettings = new Settings(patchcfgName);
+	this->loadSettings();
 }
 
 void PatchManager::checkPatchFolder()
@@ -108,7 +125,9 @@ int PatchManager::createPatchPage(MenuManager* menuManager)
     currentPatch = (*it);
     PatchEntry* entry=new PatchEntry(currentPatch);
     page->addEntry((MenuEntry*)entry);
-  }  
+  }
+  PatchSaveEntry* saveButton = new PatchSaveEntry(this);
+  page->addEntry((MenuEntry*)saveButton);
     
   menuManager->addPage(page,page->getParentMenu(),"Manage Patches");
   return 0;
@@ -138,42 +157,29 @@ bool PatchManager::isCollection(struct dirent* file)
     return isType(file, patchCollectionExtension);
 }
 
-void* PatchManager::loadFile(FILE* file, size_t minSize)
-{
-    void* loadedFile = nullptr;
-    if (file != NULL)
-    {
-        fseek(file, 0L, SEEK_END);
-        u32 fileSize = ftell(file);
-        fseek(file, 0L, SEEK_SET);
-
-        if (fileSize < minSize)
-            return nullptr;
-
-        loadedFile = (void*)malloc(fileSize);
-        if (loadedFile != nullptr)
-        {
-            fread(loadedFile, 1, fileSize, file);
-        }
-        fclose(file);
-    }
-    return loadedFile;
-}
 
 binPatch* PatchManager::loadPatch(FILE* file)
 {
-    binPatch* loadedPatch = (binPatch*)loadFile(file, sizeof(binPatch));
+    binPatch* loadedPatch = (binPatch*)loadFile(file, sizeof(binPatch),nullptr);
     return loadedPatch;
 }
 
 binPatchCollection* PatchManager::loadCollection(FILE* file)
 {
-    binPatchCollection* loadedCollection = (binPatchCollection*)loadFile(file, (sizeof(binPatch) + sizeof(binPatchCollection)));
+    binPatchCollection* loadedCollection = (binPatchCollection*)loadFile(file, (sizeof(binPatch) + sizeof(binPatchCollection)),nullptr);
     return loadedCollection;
 }
 
 int PatchManager::applyPatches()
 {  
+	ignoreFirmware = (bool) globalSettings->getValue("ignoreFirmware");
+	ignoreKernel = (bool) globalSettings->getValue("ignoreKernel");
+	ignoreRegion = (bool) globalSettings->getValue("ignoreRegion");
+	ignoreDeviceType = (bool) globalSettings->getValue("ignoreDeviceType");
+	ignoreFirmwareCollection = (bool) globalSettings->getValue("ignoreFirmwareCollection");
+	ignoreKernelCollection = (bool) globalSettings->getValue("ignoreKernelCollection");
+	ignoreRegionCollection = (bool) globalSettings->getValue("ignoreRegionCollection");
+	ignoreDeviceTypeCollection = (bool) globalSettings->getValue("ignoreDeviceTypeCollection");
     PatchCollection* currentCollection;
     for (std::vector<PatchCollection*>::iterator it = loadedCollections.begin(); it != loadedCollections.end(); ++it)
     {
@@ -405,16 +411,6 @@ void PatchManager::usePointerAndReplaceString(Patch* _patch)
 }
 
 
-//todo manage settings
-bool ignoreFirmware = true;
-bool ignoreKernel = true;
-bool ignoreRegion = true;
-bool ignoreDeviceType = true;
-bool ignoreFirmwareCollection = true;
-bool ignoreKernelCollection = true;
-bool ignoreRegionCollection = true;
-bool ignoreDeviceTypeCollection = true;
-
 bool PatchManager::checkCompatibility(Patch* _patch)
 {
     if (_patch == nullptr)
@@ -563,4 +559,38 @@ bool PatchManager::isDeviceTypeSupported(devices _devices)
             break;
     }
     return supported;
+}
+
+
+int PatchManager::saveSettings()
+{
+	for (std::vector<PatchCollection*>::iterator it = loadedCollections.begin(); it != loadedCollections.end(); ++it)
+	{
+		this->patchSettings->updateElement((*it)->getCollectionName(), (*it)->isEnabled());
+	}
+
+	for (std::vector<Patch*>::iterator it = loadedPatches.begin(); it != loadedPatches.end(); ++it)
+	{
+		this->patchSettings->updateElement((*it)->getPatchName(),(*it)->isEnabled());
+	}
+	this->patchSettings->saveSettings();
+	return 0;
+}
+
+int PatchManager::loadSettings()
+{
+	this->patchSettings->loadSettings(patchcfgName);
+	for (std::vector<PatchCollection*>::iterator it = loadedCollections.begin(); it != loadedCollections.end(); ++it)
+	{
+		if(this->patchSettings->hasElement((*it)->getCollectionName()))
+			(*it)->changeStatus(this->patchSettings->getValue((*it)->getCollectionName()));
+	}
+
+	for (std::vector<Patch*>::iterator it = loadedPatches.begin(); it != loadedPatches.end(); ++it)
+	{
+		if (this->patchSettings->hasElement((*it)->getPatchName()))
+			(*it)->changeStatus(this->patchSettings->getValue((*it)->getPatchName()));
+	}
+	this->patchSettings->saveSettings();
+	return 0;
 }

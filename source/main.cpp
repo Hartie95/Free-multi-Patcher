@@ -8,6 +8,7 @@
 #include "menuManager.h"
 #include "updater.h"
 #include "device.h"
+#include "settings.h"
 
 #include "kernel11.h"
 
@@ -24,6 +25,7 @@ int applyPatches()
 int test()
 {
 	checkForUpdate();
+	//patchManager->saveSettings();
 	return 0;
 }
 
@@ -38,6 +40,7 @@ int init(int argc)
 
     SaveVersionConstants();
 	initDeviceInformations();
+	initGlobalSettings();
     
     return 0;
 }
@@ -67,6 +70,7 @@ int main(int argc, char **argv) {
     menuManager = new MenuManager();
   
     patchManager->createPatchPage(menuManager);
+	globalSettings->createMenuPage(menuManager);
 
     while(platformIsRunning()&&exitLoop==false) 
     {

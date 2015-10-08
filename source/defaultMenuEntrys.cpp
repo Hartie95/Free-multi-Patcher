@@ -130,6 +130,6 @@ int YesNoMenuEntry::sideAction()
 string YesNoMenuEntry::getRow()
 {
 	string returnString=this->name;
-	returnString+="  "+getValueString(*this->value);
+	returnString+=" "+getValueString(*this->value);
 	return returnString;
 }

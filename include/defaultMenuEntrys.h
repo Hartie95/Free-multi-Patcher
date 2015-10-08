@@ -7,13 +7,15 @@
 #include <ctrcommon/service.hpp>
 #include "workaround.h"
 
+#define MAXNAMELENGTH 29
+
 class MenuEntry 
 {
 private:
 protected:
 	std::string name;
 	std::string description;
-    u32 maxNameLength = 25;
+    u32 maxNameLength = MAXNAMELENGTH;
     u32 maxDescriptionLength = 40;
 	MenuEntry(){
 

@@ -23,9 +23,9 @@ static const std::string patchExtension = ".patch";
 static const std::string patchCollectionExtension = ".collection";
 
 static const std::string settingsFolder=applicationFolder+"settings/";
-static const std::string settingsFileName="settings.cfg";
+static const std::string settingsExtension =".cfg";
+static const std::string globalSettingsFileName = "settings";
 
 static const std::string versionCheckUrl = "http://fmp.hartie95.de/version.txt";
-static const u32 version=0x006030;
-
+static const u32 version=0x006040;
 
