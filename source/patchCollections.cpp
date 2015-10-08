@@ -166,7 +166,7 @@ void createDefaultCollections()
     menuPatch->minKernelVersion = { 0x00, 0x00, 0x00, 0x00 };
     menuPatch->maxKernelVersion = { 0xFF, 0xFF, 0xFF, 0xFF };
     menuPatch->minFirmwareVersion = { 4, 0, 0, 0 };
-    menuPatch->maxFirmwareVersion = { 9, 9, 0, 255 };
+    menuPatch->maxFirmwareVersion = { 10, 1, 0, 255 };
     menuPatch->devicesSupported = {1,1,1,1,1,0};
     menuPatch->regionsSupported = {1,1,1,1,1,1,1,0};
     menuPatch->nandCompability = { 1, 1, 0 };
@@ -200,10 +200,10 @@ void createDefaultCollections()
     nsPatch->originalcodeSize = 4;
     nsPatch->patchcodeSize = 4;
     nsPatch->processType = 0x01;
-    nsPatch->minKernelVersion = { 0, 4, 33, 2 };
-    nsPatch->maxKernelVersion = { 255, 1, 50, 2 };
-    nsPatch->minFirmwareVersion = { 0x00, 0x00, 0x00, 0x00 };
-    nsPatch->maxFirmwareVersion = { 0xFF, 0xFF, 0xFF, 0xFF };
+    nsPatch->minKernelVersion = { 0x00, 0x00, 0x00, 0x00 };
+    nsPatch->maxKernelVersion = { 0xFF, 0xFF, 0xFF, 0xFF };
+    nsPatch->minFirmwareVersion = { 4, 0, 0, 0 };
+    nsPatch->maxFirmwareVersion = { 10, 1, 0, 255 };
     nsPatch->devicesSupported = { 1, 1, 1, 1, 1, 0 };
     nsPatch->regionsSupported = { 1, 1, 1, 1, 1, 1, 1, 0 };
     nsPatch->nandCompability = { 1, 1, 0 };
@@ -229,10 +229,10 @@ void createDefaultCollections()
     regionfree->descriptionSize = 70;
     regionfree->numberOfPatches = 2;
     regionfree->processType = 0x01;
-    regionfree->minKernelVersion = { 0, 4, 33, 2 };
-    regionfree->maxKernelVersion = { 255, 1, 50, 2 };
+    regionfree->minKernelVersion = { 0x00, 0x00, 0x00, 0x00 };
+    regionfree->maxKernelVersion = { 0xFF, 0xFF, 0xFF, 0xFF };
     regionfree->minFirmwareVersion = { 4, 0, 0, 0 };
-    regionfree->maxFirmwareVersion = { 9, 9, 0, 255 };
+    regionfree->maxFirmwareVersion = { 10, 1, 0, 255 };
     regionfree->devicesSupported = { 1, 1, 1, 1, 1, 0 };
     regionfree->regionsSupported = { 1, 1, 1, 1, 1, 1, 1, 0 };
     regionfree->nandCompability = { 1, 1, 0 };
