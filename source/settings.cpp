@@ -16,7 +16,7 @@ Settings* globalSettings;
 typedef struct settingsElementStruct
 {
 	u32 value;
-	char name[MAXNAMELENGTH];
+	char name[MAXNAMELENGTH+1];
 }settingsElement;
 
 
@@ -57,8 +57,8 @@ bool Settings::loadSettings(std::string configName)
 	{
 		size_t fileSize = 0;
 		settingsElement* elements= (settingsElement*) loadFile(file, 0, &fileSize);
-		
-		for (u32 i = 0;i < 100;i++)
+		u32 numberOfElements = fileSize / sizeof(settingsElement);
+		for (u32 i = 0;i < numberOfElements;i++)
 		{
 			string* tmp = new string(elements[i].name);
 			this->updateElement(*tmp, elements[i].value);
@@ -129,8 +129,10 @@ bool Settings::saveSettings()
 	}
 	if (file == NULL)
 		return false;
-	settingsElement elements[100] = { 0 };
+	u32 elementsSize = settings.size()*sizeof(settingsElement);
+	settingsElement* elements = (settingsElement*) malloc(elementsSize);
 	u32 i = 0;
+	memset(elements, 0, elementsSize);
 	for (SETTINGSMAP::iterator it = settings.begin(); it != settings.end(); ++it)
 	{
 		if (it->first == "")
@@ -140,8 +142,9 @@ bool Settings::saveSettings()
 		i++;
 	}
 
-	fwrite(&elements, 1, sizeof(elements), file);
+	fwrite(elements, 1, elementsSize, file);
 	fclose(file);
+	free(elements);
 	return true;
 }
 

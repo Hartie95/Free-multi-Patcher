@@ -591,6 +591,5 @@ int PatchManager::loadSettings()
 		if (this->patchSettings->hasElement((*it)->getPatchName()))
 			(*it)->changeStatus(this->patchSettings->getValue((*it)->getPatchName()));
 	}
-	this->patchSettings->saveSettings();
 	return 0;
 }
