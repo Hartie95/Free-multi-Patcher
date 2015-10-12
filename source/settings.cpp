@@ -1,6 +1,5 @@
 #include <3ds.h>
 #include <ctrcommon/fs.hpp> 
-#include <sys/dirent.h>
 #include "settings.h"
 #include "constants.h"
 #include "helpers.h"
@@ -46,9 +45,9 @@ bool Settings::loadSettings(std::string configName)
 	if (configName == "")
 		return false;
 
-	if (!fsExists(settingsFolder))
-		mkdir(settingsFolder.c_str(), 0777);
-		
+	if (!checkFolder(settingsFolder))
+		return false;
+
 	this->name = configName;
 
 	string filepath = settingsFolder+configName+settingsExtension;
@@ -121,6 +120,9 @@ bool Settings::removeElement(std::string key)
 
 bool Settings::saveSettings()
 {
+	if (!checkFolder(settingsFolder))
+		return false;
+
 	string filepath = settingsFolder + this->name + settingsExtension;
 	FILE *file = fopen(filepath.c_str(), "wb");
 	if (file == NULL)

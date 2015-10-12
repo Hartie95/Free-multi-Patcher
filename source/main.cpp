@@ -1,14 +1,15 @@
 #include <3ds.h>
 
+#include <malloc.h>
 #include <ctrcommon/input.hpp>
 #include <ctrcommon/platform.hpp>
-//#include <ctrcommon/service.hpp>
 
 #include "patchManager.h"
 #include "menuManager.h"
 #include "updater.h"
 #include "device.h"
 #include "settings.h"
+#include "helpers.h"
 
 #include "kernel11.h"
 
@@ -25,7 +26,6 @@ int applyPatches()
 int test()
 {
 	checkForUpdate();
-	//patchManager->saveSettings();
 	return 0;
 }
 
@@ -38,6 +38,7 @@ int init(int argc)
     newsInit();
     initCfgu();
 
+	checkFolder(applicationFolder);
     SaveVersionConstants();
 	initDeviceInformations();
 	initGlobalSettings();
@@ -57,18 +58,16 @@ int cleanup()
     return 0;
 }
 
-
 int main(int argc, char **argv) {
     if(init(argc)!=0) {
     return 0;
     }
-  
-    //loadSettings(); 
    
     short exitLoop=false;
-    patchManager= new PatchManager();
     menuManager = new MenuManager();
-  
+
+    patchManager = new PatchManager();
+
     patchManager->createPatchPage(menuManager);
 	globalSettings->createMenuPage(menuManager);
 
@@ -77,17 +76,18 @@ int main(int argc, char **argv) {
         //Todo: replace with switch case
         exitLoop = menuManager->ManageInput();
 
-        menuManager->drawMenu();
-
         if(inputIsPressed(BUTTON_SELECT))
         {
 			test();
         }
 
-        if (inputIsPressed(BUTTON_START)) {
+        if (inputIsPressed(BUTTON_START)) 
+		{
             KernelBackdoor(&applyPatches);
             exitLoop = true;
         }
+		
+		menuManager->drawMenu();
     }
 
     cleanup();

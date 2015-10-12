@@ -41,7 +41,6 @@ private:
 
 public:
     PatchManager();
-    void checkPatchFolder();
     void loadPatchFiles();
     int createPatchPage(MenuManager* menuManager);
 

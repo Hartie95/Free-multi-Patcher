@@ -53,18 +53,12 @@ void* stringcpy(void* destination, void* string, size_t stringSize, u32 offset)
 
 PatchManager::PatchManager()
 {
-	this->checkPatchFolder();
+	checkFolder(patchesFolder);
 	createDefaultPatches();
 	createDefaultCollections();
 	this->loadPatchFiles();
 	this->patchSettings = new Settings(patchcfgName);
 	this->loadSettings();
-}
-
-void PatchManager::checkPatchFolder()
-{
-    if(!fsExists(patchesFolder))
-        mkdir(patchesFolder.c_str(), 0777);
 }
 
 void PatchManager::loadPatchFiles()
