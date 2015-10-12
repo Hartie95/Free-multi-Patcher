@@ -28,5 +28,5 @@ static const std::string globalSettingsFileName = "settings";
 
 static const std::string versionCheckUrl = "http://fmp.hartie95.de/version.txt";
 static const u32 version=0x006050;
-static const std::string versionString = "0.6-Beta2";
+static const std::string versionString = "v0.6-Beta2";
 
