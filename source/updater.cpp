@@ -66,7 +66,7 @@ int checkForUpdate()
             message16[i] = (u16)message8[i];
         }
         
-        NEWSU_AddNotification(title16, sizeof(title8), message16, sizeof(message8), nullptr, 0, false);
+		NEWS_AddNotification(title16, sizeof(title8), message16, sizeof(message8), nullptr, 0, false);
     }
     return onlineVersion;
 }

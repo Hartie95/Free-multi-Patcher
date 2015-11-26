@@ -36,7 +36,7 @@ int init(int argc)
     }
     httpcInit();
     newsInit();
-    initCfgu();
+	cfguInit();
 
 	checkFolder(applicationFolder);
     SaveVersionConstants();
@@ -52,7 +52,7 @@ int cleanup()
 
     httpcExit();
     newsExit();
-    exitCfgu();
+	cfguExit();
 
     platformCleanup();
     return 0;

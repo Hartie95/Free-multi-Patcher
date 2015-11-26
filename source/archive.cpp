@@ -27,7 +27,7 @@ u32 CVer_tidlow_regionarray[7] = {
 	0x00017602 //TWN
 };
 
-FS_archive extdata_archives[TotalExtdataArchives];
+FS_Archive extdata_archives[TotalExtdataArchives];
 
 Result archive_readfile(Archive archive, char *path, u8 *buffer, u32 size)
 {
@@ -55,7 +55,7 @@ Result archive_readfile(Archive archive, char *path, u8 *buffer, u32 size)
 		return 0;
 	}
 
-	ret = FSUSER_OpenFile(NULL, &filehandle, extdata_archives[archive], FS_makePath(PATH_CHAR, path), FS_OPEN_READ, 0);
+	ret = FSUSER_OpenFile(&filehandle, extdata_archives[archive], fsMakePath(PATH_ASCII, path), FS_OPEN_READ, 0);
 	if (ret != 0)return ret;
 
 	ret = FSFILE_Read(filehandle, &tmpval, 0, buffer, size);
@@ -67,12 +67,12 @@ Result archive_readfile(Archive archive, char *path, u8 *buffer, u32 size)
 	return ret;
 }
 
-Result read_versionbin(FS_archive archive, FS_path fileLowPath, u8 *versionbin)
+Result read_versionbin(FS_Archive archive, FS_Path fileLowPath, u8 *versionbin)
 {
 	Result ret = 0;
 	Handle filehandle = 0;
 
-	ret = FSUSER_OpenFileDirectly(NULL, &filehandle, archive, fileLowPath, FS_OPEN_READ, 0x0);
+	ret = FSUSER_OpenFileDirectly(&filehandle, archive, fileLowPath, FS_OPEN_READ, 0x0);
 	if (ret != 0)
 	{
 		printf("Failed to open the RomFS image for *Ver: 0x%08x.\n", (unsigned int)ret);
@@ -102,8 +102,8 @@ Result readVerFile(u8* string, u32 size, u32 tidlow)
 {
 	Result ret = 0;
 
-	FS_archive archive;
-	FS_path fileLowPath;
+	FS_Archive archive;
+	FS_Path fileLowPath;
 	u32 archive_lowpath_data[0x10 >> 2];
 	u32 file_lowpath_data[0x14 >> 2];
 

@@ -10,7 +10,7 @@ typedef enum {
 } Archive;
 
 Result archive_readfile(Archive archive, char *path, u8 *buffer, u32 size);
-Result read_versionbin(FS_archive archive, FS_path fileLowPath, u8 *versionbin);
+Result read_versionbin(FS_Archive archive, FS_Path fileLowPath, u8 *versionbin);
 
 Result readVerFile(u8* cverString, u32 size, u32 tidlow);
 

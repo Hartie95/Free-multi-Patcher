@@ -39,7 +39,7 @@ void SaveVersionConstants()
     u32 kversion = *(vu32*)0x1FF80000; // KERNEL_VERSION register
 
     u8 is_n3ds = 0;
-    APT_CheckNew3DS(NULL, &is_n3ds);
+    APT_CheckNew3DS(&is_n3ds);
 
     if (kversion < 0x022C0600) {
         kproc_size = 0x260;
