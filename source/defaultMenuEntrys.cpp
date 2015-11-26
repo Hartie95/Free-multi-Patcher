@@ -4,6 +4,7 @@ using namespace std;
 
 MenuEntry::MenuEntry(std::string name, std::string description)
 {
+	this->type = ' ';
 	this->setName(name);
 	this->setDescription(description);
 }
@@ -61,14 +62,16 @@ string MenuEntry::getDescription()
 }
 string MenuEntry::getRow()
 {
-	return this->name;
+	string returnString="";
+	returnString += this->type;
+	returnString += " ";
+	returnString += this->name;
+	return returnString;
 }
 
-BackMenuEntry::BackMenuEntry(MenuManagerM* manager,string name, string description)
+BackMenuEntry::BackMenuEntry(MenuManagerM* manager,string name, string description):MenuEntry(name, description)
 {
     this->manager = manager;
-    this->setName(name);
-    this->setDescription(description);
 }
 
 int BackMenuEntry::aAction() 
@@ -82,12 +85,10 @@ void BackMenuEntry::back()
 	this->manager->back();
 }
 
-NavigationMenuEntry::NavigationMenuEntry(MenuManagerM* manager,MenuM* menu,std::string name, std::string description)
+NavigationMenuEntry::NavigationMenuEntry(MenuManagerM* manager,MenuM* menu,std::string name, std::string description):MenuEntry(name, description)
 {
 	this->manager = manager;
     this->menu = menu;
-    this->setName(name);
-    this->setDescription(description);
 }
 
 int NavigationMenuEntry::aAction() 
@@ -102,13 +103,11 @@ void NavigationMenuEntry::navigate()
 }
 
 
-YesNoMenuEntry::YesNoMenuEntry(bool* value,std::string name, std::string description)
+YesNoMenuEntry::YesNoMenuEntry(bool* value,std::string name, std::string description) :MenuEntry(name, description)
 {
 	if(value==nullptr)
 		value=new bool(true);
     this->value = value;
-    this->setName(name);
-    this->setDescription(description);
 }
 
 string YesNoMenuEntry::getValueString(bool value)
@@ -129,7 +128,8 @@ int YesNoMenuEntry::sideAction()
 
 string YesNoMenuEntry::getRow()
 {
-	string returnString=this->name;
+	string returnString = MenuEntry::getRow();
+	
 	returnString+=" "+getValueString(*this->value);
 	return returnString;
 }

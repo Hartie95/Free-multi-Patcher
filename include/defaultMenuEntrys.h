@@ -14,6 +14,7 @@ class MenuEntry
 private:
 protected:
 	std::string name;
+	char type;
 	std::string description;
     u32 maxNameLength = MAXNAMELENGTH;
     u32 maxDescriptionLength = 40;

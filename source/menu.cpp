@@ -96,7 +96,7 @@ void Menu::drawMenu()
 		    menuStream << "-> ";
 	    else
 		    menuStream << "   ";
-
+	
 	    menuStream <<(*it)->getRow();
 	    menuStream << "\n";
 	    i++;
@@ -112,10 +112,11 @@ void Menu::drawMenu()
     gpuViewport(BOTTOM_SCREEN, 0, 0, BOTTOM_WIDTH, BOTTOM_HEIGHT);
     gputOrtho(0, BOTTOM_WIDTH, 0, BOTTOM_HEIGHT, -1, 1);
     gpuClearColor(0xFF, 0xFF, 0xFF, 0xFF);
-    gputDrawString(menu, 20, BOTTOM_HEIGHT-30-gputGetStringHeight(menu, 8) , 8, 8, 0, 0, 0);
-    gputDrawString(description, 30, 50-gputGetStringHeight(description, 8), 8, 8, 0, 0, 0);
+    gputDrawString(menu, 15, BOTTOM_HEIGHT-30-gputGetStringHeight(menu, 8) , 8, 8, 0, 0, 0);
+    gputDrawString(description, 25, 50-gputGetStringHeight(description, 8), 8, 8, 0, 0, 0);
 
     gpuFlushBuffer();
 
     gpuSwapBuffers(true);
 }
+

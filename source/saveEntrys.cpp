@@ -3,11 +3,10 @@
 using namespace std;
 
 
-SaveEntry::SaveEntry(Settings* settings)
+SaveEntry::SaveEntry(Settings* settings) :MenuEntry("save", "")
 {
 	if (settings != nullptr)
 	{
-		this->name = "save";
 		this->settings = settings;
 	}
 }
@@ -20,11 +19,10 @@ int SaveEntry::aAction()
 }
 
 
-PatchSaveEntry::PatchSaveEntry(PatchManager* manager)
+PatchSaveEntry::PatchSaveEntry(PatchManager* manager) :MenuEntry("save", "")
 {
 	if (manager != nullptr)
 	{
-		this->name = "save";
 		this->patchManager = manager;
 	}
 }

@@ -9,6 +9,7 @@ CollectionEntry::CollectionEntry(PatchCollection* collection,MenuManagerM* manag
 {
     this->value = new bool();
     this->collection = collection;
+	this->type = 'C';
     this->setName(this->collection->getCollectionName());
     this->setDescription(this->collection->getDescription());
     *this->value = this->collection->isEnabled();

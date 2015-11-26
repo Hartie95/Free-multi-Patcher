@@ -6,6 +6,7 @@ PatchEntry::PatchEntry(Patch* patch)
 {
 	this->value=new bool();
 	this->patch=patch;
+	this->type = 'P';
 	this->setName(this->patch->getPatchName());
 	this->setDescription(this->patch->getDescription());
 	*this->value=this->patch->isEnabled();
