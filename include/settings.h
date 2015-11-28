@@ -27,9 +27,9 @@ public:
 	bool saveSettings();
 	bool hasElement(std::string key);
 	u32 getValue(std::string elementName);
+	u32* getValuePointer(std::string elementName);
 	u32 getNumberOfElements();
 	bool createMenuPage(MenuManager* menuManager);
 };
 
 extern Settings* globalSettings;
-

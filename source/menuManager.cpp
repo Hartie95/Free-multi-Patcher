@@ -7,17 +7,20 @@
 
 using namespace std;
 
-MenuManager::MenuManager()
+MenuManager::MenuManager(bool* exit)
 {
 	this->mainPage=new Menu(this,nullptr);
 	this->currentPage=this->mainPage;
 	
 	this->menuPages.push_back(this->mainPage);
 
-	this->exit=false;
+	//Generates Version String for the UI
+	this->versionString = generateVersionString(version);
+
+	this->exit=exit;
 }
 
-bool MenuManager::ManageInput()
+void MenuManager::ManageInput()
 {
 	inputPoll();
 
@@ -42,8 +45,6 @@ bool MenuManager::ManageInput()
     if(inputIsPressed(BUTTON_B)) {
     	this->back();
     }
-
-    return this->exit;
 }
 
 void MenuManager::back()
@@ -76,7 +77,7 @@ void MenuManager::addPage(Menu* page, Menu* parent, string name)
 void MenuManager::setActivePage(Menu* page)
 {
 	if(page==nullptr)
-		this->exit=true;
+		*this->exit=true;
 	else
 		this->currentPage=page;
 }

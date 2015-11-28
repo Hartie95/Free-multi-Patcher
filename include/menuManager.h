@@ -19,14 +19,15 @@ private:
 	std::vector<Menu*> menuPages;
 	Menu* mainPage;
 	Menu* currentPage;
-	bool  exit;
+	bool*  exit;
+	std::string versionString;
 
 	void setActivePage(Menu* page);
 
 public:
-	MenuManager();
+	MenuManager(bool* exit);
 
-	bool ManageInput();
+	void ManageInput();
 	
 	void back();
 	void navigateTo(MenuM* targetPage);

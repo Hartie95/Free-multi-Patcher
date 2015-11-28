@@ -17,6 +17,7 @@ using namespace std;
 
 PatchManager* patchManager;
 MenuManager* menuManager;
+Updater* updater;
 
 int applyPatches()
 {
@@ -25,7 +26,6 @@ int applyPatches()
 
 int test()
 {
-	checkForUpdate();
 	return 0;
 }
 
@@ -37,6 +37,7 @@ int init(int argc)
     httpcInit();
     newsInit();
 	cfguInit();
+	pmInit();
 
 	checkFolder(applicationFolder);
     SaveVersionConstants();
@@ -53,6 +54,7 @@ int cleanup()
     httpcExit();
     newsExit();
 	cfguExit();
+	pmExit();
 
     platformCleanup();
     return 0;
@@ -63,18 +65,19 @@ int main(int argc, char **argv) {
     return 0;
     }
    
-    short exitLoop=false;
-    menuManager = new MenuManager();
+    bool exitLoop=false;
+    menuManager = new MenuManager(&exitLoop);
 
     patchManager = new PatchManager();
 
     patchManager->createPatchPage(menuManager);
 	globalSettings->createMenuPage(menuManager);
+	updater = new Updater(menuManager,&exitLoop);
 
     while(platformIsRunning()&&exitLoop==false) 
     {
         //Todo: replace with switch case
-        exitLoop = menuManager->ManageInput();
+        menuManager->ManageInput();
 
         if(inputIsPressed(BUTTON_SELECT))
         {

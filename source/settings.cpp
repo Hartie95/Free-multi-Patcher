@@ -150,11 +150,18 @@ bool Settings::saveSettings()
 	return true;
 }
 
-u32 Settings::getValue(std::string key)
+u32 Settings::getValue(std::string elementName)
 {
-	if(this->hasElement(key))
-		return settings.find(key)->second;
+	if(this->hasElement(elementName))
+		return settings.find(elementName)->second;
 	else return 0;
+}
+
+u32* Settings::getValuePointer(std::string elementName)
+{
+	if (this->hasElement(elementName))
+		return &settings.find(elementName)->second;
+	else return nullptr;
 }
 
 u32 Settings::getNumberOfElements()

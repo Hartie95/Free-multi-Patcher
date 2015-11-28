@@ -3,8 +3,7 @@
 #include <3ds.h>
 #include <stdio.h>
 
-#include <ctrcommon/input.hpp>
-#include <ctrcommon/service.hpp>
+#include <string>
 #include "workaround.h"
 
 #define MAXNAMELENGTH 29
