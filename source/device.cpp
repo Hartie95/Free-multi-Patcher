@@ -1,5 +1,4 @@
 #include "device.h"
-#include "archive.h"
 
 
 #include <string>
@@ -9,7 +8,6 @@
 using namespace std;
 
 deviceInformations device;
-
 
 int initDeviceInformations()
 {
@@ -41,16 +39,16 @@ int setDeviceRegion()
 int setFirmwareVersion()
 {
 	Result ret = 0;
-	u8 nver_versionbin[0x8];
-	u8 cver_versionbin[0x8];
+	OS_VersionBin nver_versionbin;
+	OS_VersionBin cver_versionbin;
+	memset(&nver_versionbin, 0, sizeof(OS_VersionBin));
+	memset(&cver_versionbin, 0, sizeof(OS_VersionBin));
+	ret = osGetSystemVersionData(&nver_versionbin, &cver_versionbin);
 	
-	ret = readNver(nver_versionbin, sizeof(nver_versionbin));
-	ret = readCver(cver_versionbin, sizeof(cver_versionbin));
-
-	device.firmwareversion.major = cver_versionbin[2];
-	device.firmwareversion.minor = cver_versionbin[1];
-	device.firmwareversion.revision = cver_versionbin[0];
-	device.firmwareversion.nver = nver_versionbin[2];
+	device.firmwareversion.major = cver_versionbin.mainver;
+	device.firmwareversion.minor = cver_versionbin.minor;
+	device.firmwareversion.revision = cver_versionbin.build;
+	device.firmwareversion.nver = nver_versionbin.mainver;
 	return ret;
 }
 
