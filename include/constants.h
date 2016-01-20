@@ -29,6 +29,10 @@ static const std::string globalSettingsFileName = "settings";
 static const std::string mainUrl = "http://fmp.hartie95.de/";
 static const std::string mainDownloadUrl = mainUrl + "updates/";
 static const std::string versionCheckUrl = mainUrl + "version.txt";
-static const u32 version=0x00060365;
+
+static const std::string mainDownloadUrlDev = mainUrl + "devUpdates/";
+static const std::string VersionCheckUrlDev = mainUrl + "devVersion.txt";
+
+static const u32 version=0x00060366;
 
 std::string generateVersionString(u32 version);

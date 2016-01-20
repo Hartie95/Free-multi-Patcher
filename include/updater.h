@@ -8,6 +8,7 @@
 #define SETTINGS_BOOT_CHECK "CheckForUpdateAtBoot"
 #define SETTINGS_UPDATE_NOTIFICATION "EnableUpdateNotifications"
 #define SETTINGS_LAST_NOTIFICATION "lastVersionNotification"
+#define SETTINGS_DEV_BUILDS "enableDevelopmentBuilds"
 
 class Updater
 {

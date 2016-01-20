@@ -20,6 +20,7 @@ Updater::Updater(MenuManager* manager, bool* exitLoop)
 	this->updaterSettings = new Settings("Updater");
 	this->updaterSettings->addElement(SETTINGS_BOOT_CHECK, false);
 	this->updaterSettings->addElement(SETTINGS_UPDATE_NOTIFICATION, false);
+	this->updaterSettings->addElement(SETTINGS_DEV_BUILDS, false);
 	this->updaterSettings->addElement(SETTINGS_LAST_NOTIFICATION, version);
 	this->updaterSettings->loadSettings("Updater");
 
@@ -75,6 +76,11 @@ Result Updater::createMenuPage(MenuManager* manager)
 								"Create update notifications",
 								"Create update notifikations in the homemenu for new Versions");
 	menuPage->addEntry((MenuEntry*)entry);
+	
+	entry = (MenuEntry*)new YesNoMenuEntry((bool*)this->updaterSettings->getValuePointer(SETTINGS_DEV_BUILDS),
+		"Enable DevelopmentBuilds",
+		"This enables Development builds.\n Warning these builds could be broken");
+	menuPage->addEntry((MenuEntry*)entry);
 
 	entry = (MenuEntry*) new SaveEntry(this->updaterSettings);
 	menuPage->addEntry((MenuEntry*)entry);
@@ -94,7 +100,10 @@ Result Updater::checkVersion()
 	this->onlineVersionString = "";
 	size_t downloadSize = 0;
 	u8* downloadResult = nullptr;
-	Result res = download((string*)&versionCheckUrl, &downloadSize, &downloadResult);
+	const string* currentVersionCheck = &versionCheckUrl;
+	if (this->updaterSettings->getValue(SETTINGS_DEV_BUILDS))
+		currentVersionCheck = &VersionCheckUrlDev;
+	Result res = download((string*)currentVersionCheck, &downloadSize, &downloadResult);
 	if (res == 0)
 	{
 		char versionString[downloadSize + 1];
@@ -143,6 +152,8 @@ Result Updater::downloadUpdate()
 	size_t downloadSize = 0;
 	u8* downloadResult = nullptr;
 	string url = mainDownloadUrl + this->onlineVersionString + ".txt";
+	if (this->updaterSettings->getValue(SETTINGS_DEV_BUILDS))
+		url = mainDownloadUrlDev+this->onlineVersionString+".txt";
 	Result res = download(&url,&downloadSize,&downloadResult);
 
 	if (res == 0)
