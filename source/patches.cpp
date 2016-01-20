@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <string.h>
-#include <ctrcommon/fs.hpp>
+#include <citrus/fs.hpp>
 #include <stdlib.h>
 
 #include "patches.h"
 
 using namespace std;
+using namespace ctr;
 
     
 Patch::Patch(binPatch *_patch)

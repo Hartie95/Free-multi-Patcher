@@ -3,8 +3,7 @@
 #define MENUMANAGER_H
 
 #include <3ds.h>
-#include <ctrcommon/input.hpp>
-#include <ctrcommon/service.hpp>
+#include <citrus/hid.hpp>
 #include <stdio.h>
 #include <vector>
 
@@ -37,7 +36,7 @@ public:
 	Menu* getMainPage();
 
 	void drawMenu();
-	void drowTop();
+	void drawTop();
 };
 
 #endif

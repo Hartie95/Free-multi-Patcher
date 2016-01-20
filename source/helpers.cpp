@@ -1,9 +1,10 @@
 #include "helpers.h"
-#include <ctrcommon/fs.hpp> 
+#include <citrus/fs.hpp> 
 #include "malloc.h"
 #include <sys/dirent.h>
 
 using namespace std;
+using namespace ctr;
 
 void* loadFile(FILE* file, size_t minSize,size_t* fileSize)
 {
@@ -32,7 +33,7 @@ void* loadFile(FILE* file, size_t minSize,size_t* fileSize)
 
 bool checkFolder(string name)
 {
-	if (!fsExists(name))
+	if (!fs::exists(name))
 		mkdir(name.c_str(), 0777);
 	return true;
 }

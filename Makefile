@@ -8,4 +8,4 @@ endif
 # ENABLE_EXCEPTIONS: Enable C++ exceptions.
 #---------------------------------------------------------------------------------
 
-include $(DEVKITPRO)/ctrcommon/tools/make_base
+include $(DEVKITPRO)/citrus/tools/make_base

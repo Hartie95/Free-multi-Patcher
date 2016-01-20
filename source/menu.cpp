@@ -1,10 +1,12 @@
 #include <sstream>
-#include <ctrcommon/gpu.hpp>
+#include <citrus/gpu.hpp>
+#include <citrus/gput.hpp>
 
 #include "menu.h"
 #include "workaround.h"
 
 using namespace std;
+using namespace ctr;
 
 Menu::Menu(MenuManager* parentManager, Menu* parentMenu)
 {
@@ -108,15 +110,22 @@ void Menu::drawMenu()
     string menu = menuStream.str();
     string description = descriptionStream.str();
 	
-    gpuClear(); 
-    gpuViewport(BOTTOM_SCREEN, 0, 0, BOTTOM_WIDTH, BOTTOM_HEIGHT);
-    gputOrtho(0, BOTTOM_WIDTH, 0, BOTTOM_HEIGHT, -1, 1);
-    gpuClearColor(0xFF, 0xFF, 0xFF, 0xFF);
-    gputDrawString(menu, 15, BOTTOM_HEIGHT-30-gputGetStringHeight(menu, 8) , 8, 8, 0, 0, 0);
-    gputDrawString(description, 25, 50-gputGetStringHeight(description, 8), 8, 8, 0, 0, 0);
+	u32 screenWidth;
+	u32 screenHeight;
+	gpu::setViewport(gpu::SCREEN_BOTTOM, 0, 0, gpu::BOTTOM_WIDTH, gpu::BOTTOM_HEIGHT);
+	gput::setOrtho(0, gpu::BOTTOM_WIDTH, 0, gpu::BOTTOM_HEIGHT, -1, 1);
+	gpu::setClearColor(0xFF, 0xFF, 0xFF, 0xFF);
+	gpu::clear();
 
-    gpuFlushBuffer();
+	gpu::getViewportWidth(&screenWidth);
+	gpu::getViewportHeight(&screenHeight);
 
-    gpuSwapBuffers(true);
+	gput::drawString(menu, 15, screenHeight -30-gput::getStringHeight(menu, 8) , 8, 8, 0, 0, 0);
+	gput::drawString(description, 25, 50-gput::getStringHeight(description, 8), 8, 8, 0, 0, 0);
+
+	gpu::flushCommands();
+	gpu::flushBuffer();
+
+	gpu::swapBuffers(true);
 }
 

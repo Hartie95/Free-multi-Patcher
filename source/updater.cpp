@@ -2,13 +2,15 @@
 #include "constants.h"
 #include "settings.h"
 #include <stdlib.h>
-#include <ctrcommon\app.hpp>
+#include <citrus/app.hpp>
+#include <citrus/err.hpp>
 #include "saveEntrys.h"
 #include "updaterEntry.h"
 #include "helpers.h"
 
 
 using namespace std;
+using namespace ctr;
 
 Updater::Updater(MenuManager* manager, bool* exitLoop)
 {
@@ -208,10 +210,18 @@ Result Updater::installUpdate()
 
 	string filepath = applicationFolder + UpdateFileName;
 	/*App applicationInformation = appGetCiaInfo(filepath, SD);*/
-	Result res = appInstallFile(SD, filepath, NULL);
-	if (res == 0)
+	FILE* fd = fopen(filepath.c_str(), "r");
+	if (!fd) {
+		return 1;
+	}
+	
+	struct stat st;
+	fstat(fileno(fd), &st);
+
+	app::install(fs::SD, fd,(u64) st.st_size, NULL);
+	if (!err::has())
 		*exitLoop = true;
-	return res;
+	return 0;
 }
 
 

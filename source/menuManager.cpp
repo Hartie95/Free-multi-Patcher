@@ -1,11 +1,13 @@
 #include <sstream>
-#include <ctrcommon/gpu.hpp>
+#include <citrus/gpu.hpp>
+#include <citrus/gput.hpp>
 
 #include "menuManager.h"
 #include "patchManager.h"
 #include "device.h"
 
 using namespace std;
+using namespace ctr;
 
 MenuManager::MenuManager(bool* exit)
 {
@@ -22,27 +24,27 @@ MenuManager::MenuManager(bool* exit)
 
 void MenuManager::ManageInput()
 {
-	inputPoll();
+	hid::poll();
 
-    if(inputIsPressed(BUTTON_UP))
+    if(hid::pressed(hid::BUTTON_UP))
     {
       	currentPage->menuChangeSelection("up");
     }
-    else if(inputIsPressed(BUTTON_DOWN))
+    else if(hid::pressed(hid::BUTTON_DOWN))
     {
       	currentPage->menuChangeSelection("down");
     }
 
-    if(inputIsPressed(BUTTON_LEFT)||inputIsPressed(BUTTON_RIGHT))
+    if(hid::pressed(hid::BUTTON_LEFT)|| hid::pressed(hid::BUTTON_RIGHT))
     {
       	currentPage->selectionDoSiteAction();
     }
 
-    if(inputIsPressed(BUTTON_A)) {
+    if(hid::pressed(hid::BUTTON_A)) {
         currentPage->selectionDoAAction();
     }
 
-    if(inputIsPressed(BUTTON_B)) {
+    if(hid::pressed(hid::BUTTON_B)) {
     	this->back();
     }
 }
@@ -90,7 +92,7 @@ Menu* MenuManager::getMainPage()
 
 void MenuManager::drawMenu()
 {
-	this->drowTop();
+	this->drawTop();
 	this->currentPage->drawMenu();
 }
 
@@ -180,7 +182,7 @@ string checkKernelVersion()
     return result+"\n";
 }
 
-void MenuManager::drowTop()
+void MenuManager::drawTop()
 {
     string deviceInformations = "Model: " + getModel() + checkKernelVersion()+checkFirmwareVersion();
 	const string title  = "Free Multi Patcher by hartie95";
@@ -195,15 +197,22 @@ void MenuManager::drowTop()
 	  
 	string usage = usageStream.str(); 
 
-	gpuClear(); 
-	gpuViewport(TOP_SCREEN, 0, 0, TOP_WIDTH, TOP_HEIGHT);
-	gputOrtho(0, TOP_WIDTH, 0, TOP_HEIGHT, -1, 1);
-	gpuClearColor(0xFF, 0xFF, 0xFF, 0xFF); 
-	gputDrawString(title, (gpuGetViewportWidth() - gputGetStringWidth(title, 12)) / 2, (gpuGetViewportHeight() - gputGetStringHeight(title, 12))/2+55, 12, 12, 0 , 0 , 0); 
-	gputDrawString(credit, (gpuGetViewportWidth() - gputGetStringWidth(credit, 8)) / 2, (gpuGetViewportHeight() - gputGetStringHeight(credit, 8))/2+42, 8, 8, 0, 0, 0);
-	gputDrawString(deviceInformations, (gpuGetViewportWidth() - gputGetStringWidth(deviceInformations, 8)) / 2, (gpuGetViewportHeight() - gputGetStringHeight(deviceInformations, 8)) / 2-20, 8, 8, 10, 10, 10);
-	gputDrawString(usage, (gpuGetViewportWidth() - gputGetStringWidth(usage, 8)) / 2, (gpuGetViewportHeight() - gputGetStringHeight(usage, 8))/2-75, 8, 8, 0 , 0 , 0); 
-	gputDrawString(versionString, gpuGetViewportWidth() - gputGetStringWidth(versionString, 8)-5, gputGetStringHeight(versionString, 8), 8, 8, 0, 0, 0);
+	u32 screenWidth;
+	u32 screenHeight;
 
-	gpuFlushBuffer();
+	gpu::setViewport(gpu::SCREEN_TOP, 0, 0, gpu::TOP_WIDTH, gpu::TOP_HEIGHT);
+	gput::setOrtho(0, gpu::TOP_WIDTH, 0, gpu::TOP_HEIGHT, -1, 1);
+	gpu::setClearColor(0xFF, 0xFF, 0xFF, 0xFF);
+	gpu::clear();
+
+	gpu::getViewportWidth(&screenWidth);
+	gpu::getViewportHeight(&screenHeight);
+
+	gput::drawString(title, (screenWidth - gput::getStringWidth(title, 12)) / 2, (screenHeight - gput::getStringHeight(title, 12))/2+55, 12, 12, 0 , 0 , 0);
+	gput::drawString(credit, (screenWidth - gput::getStringWidth(credit, 8)) / 2, (screenHeight - gput::getStringHeight(credit, 8))/2+42, 8, 8, 0, 0, 0);
+	gput::drawString(deviceInformations, (screenWidth - gput::getStringWidth(deviceInformations, 8)) / 2, (screenHeight - gput::getStringHeight(deviceInformations, 8)) / 2-20, 8, 8, 10, 10, 10);
+	gput::drawString(usage, (screenWidth - gput::getStringWidth(usage, 8)) / 2, (screenHeight -gput::getStringHeight(usage, 8))/2-75, 8, 8, 0 , 0 , 0);
+	gput::drawString(versionString, screenWidth - gput::getStringWidth(versionString, 8)-5, gput::getStringHeight(versionString, 8), 8, 8, 0, 0, 0);
+	gpu::flushCommands();
+	gpu::flushBuffer();
 }

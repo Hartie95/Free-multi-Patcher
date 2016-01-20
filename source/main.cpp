@@ -1,8 +1,8 @@
 #include <3ds.h>
 
 #include <malloc.h>
-#include <ctrcommon/input.hpp>
-#include <ctrcommon/platform.hpp>
+#include <citrus/hid.hpp>
+#include <citrus/core.hpp>
 
 #include "patchManager.h"
 #include "menuManager.h"
@@ -14,6 +14,7 @@
 #include "kernel11.h"
 
 using namespace std;
+using namespace ctr;
 
 PatchManager* patchManager;
 MenuManager* menuManager;
@@ -31,7 +32,7 @@ int test()
 
 int init(int argc)
 {
-    if (!platformInit(argc)) {
+    if (!core::init(argc)) {
         return 1;
     }
     httpcInit();
@@ -56,7 +57,7 @@ int cleanup()
 	cfguExit();
 	pmExit();
 
-    platformCleanup();
+    core::exit();
     return 0;
 }
 
@@ -74,17 +75,17 @@ int main(int argc, char **argv) {
 	globalSettings->createMenuPage(menuManager);
 	updater = new Updater(menuManager,&exitLoop);
 
-    while(platformIsRunning()&&exitLoop==false) 
+    while(core::running()&&exitLoop==false) 
     {
         //Todo: replace with switch case
         menuManager->ManageInput();
 
-        if(inputIsPressed(BUTTON_SELECT))
+        if(hid::pressed(hid::BUTTON_SELECT))
         {
 			test();
         }
 
-        if (inputIsPressed(BUTTON_START)) 
+        if (hid::pressed(hid::BUTTON_START))
 		{
             KernelBackdoor(&applyPatches);
             exitLoop = true;

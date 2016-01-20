@@ -1,5 +1,5 @@
-#include <ctrcommon/gpu.hpp>
-#include <ctrcommon/fs.hpp> 
+#include <citrus/gpu.hpp>
+#include <citrus/fs.hpp> 
 
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -18,6 +18,7 @@
 #include "helpers.h"
 
 using namespace std;
+using namespace ctr;
 
 
 bool ignoreFirmware = false;

@@ -1,5 +1,5 @@
 #include <3ds.h>
-#include <ctrcommon/fs.hpp> 
+#include <citrus/fs.hpp> 
 #include "settings.h"
 #include "constants.h"
 #include "helpers.h"
@@ -8,6 +8,7 @@
 #include "saveEntrys.h"
 
 using namespace std;
+using namespace ctr;
 
 Settings* globalSettings;
 
