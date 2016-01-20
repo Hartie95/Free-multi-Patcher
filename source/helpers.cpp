@@ -36,3 +36,17 @@ bool checkFolder(string name)
 		mkdir(name.c_str(), 0777);
 	return true;
 }
+
+
+std::string getStringFromDownload(size_t downloadSize, u8* downloadResult)
+{
+	string resultString = "";
+	char urlString[downloadSize + 1];
+	for (u32 i = 0; i<downloadSize; i++)
+	{
+		urlString[i] = (char)downloadResult[i];
+	}
+	urlString[downloadSize] = '\0';
+	resultString = string(urlString);
+	return resultString;
+}

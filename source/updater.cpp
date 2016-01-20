@@ -5,6 +5,7 @@
 #include <ctrcommon\app.hpp>
 #include "saveEntrys.h"
 #include "updaterEntry.h"
+#include "helpers.h"
 
 
 using namespace std;
@@ -73,13 +74,13 @@ Result Updater::createMenuPage(MenuManager* manager)
 	menuPage->addEntry((MenuEntry*)entry);
 
 	entry = (MenuEntry*)new YesNoMenuEntry((bool*)this->updaterSettings->getValuePointer(SETTINGS_UPDATE_NOTIFICATION),
-								"Create update notifications",
-								"Create update notifikations in the homemenu for new Versions");
+												"Create update notifications",
+												"Create update notifikations in the homemenu for new Versions");
 	menuPage->addEntry((MenuEntry*)entry);
 	
 	entry = (MenuEntry*)new YesNoMenuEntry((bool*)this->updaterSettings->getValuePointer(SETTINGS_DEV_BUILDS),
-		"Enable DevelopmentBuilds",
-		"This enables Development builds.\n Warning these builds could be broken");
+												"Enable DevelopmentBuilds",
+												"This enables Development builds.\n Warning these builds could be broken");
 	menuPage->addEntry((MenuEntry*)entry);
 
 	entry = (MenuEntry*) new SaveEntry(this->updaterSettings);
@@ -106,14 +107,8 @@ Result Updater::checkVersion()
 	Result res = download((string*)currentVersionCheck, &downloadSize, &downloadResult);
 	if (res == 0)
 	{
-		char versionString[downloadSize + 1];
-		for (u32 i = 0; i<downloadSize; i++)
-		{
-			versionString[i] = (char)downloadResult[i];
-		}
-		versionString[downloadSize] = '\0';
-		this->onlineVersionString = string(versionString);
-		this->onlineVersion = (int)strtol(versionString, NULL, 16);
+		this->onlineVersionString = getStringFromDownload(downloadSize, downloadResult);
+		this->onlineVersion = (int)strtol(onlineVersionString.c_str(), NULL, 16);
 		free(downloadResult);
 	}
 	return res;
@@ -125,7 +120,12 @@ Result Updater::createUpdateNotification()
 	if (this->updaterSettings->getValue(SETTINGS_LAST_NOTIFICATION) < this->onlineVersion)
 	{
 		const char title8[] = { "A New Version is available" };
-		string message = "A new version is available:\n" + generateVersionString(this->onlineVersion) + "\n\nPlease install it directly inside of the fpm or download it from http://fmp.hartie95.de/releases";
+		string message = "A new version is available:\n" + generateVersionString(this->onlineVersion) + "\n\nPlease install it directly inside of \nthe fpm or download it from\nhttp://fmp.hartie95.de/releases\n";
+		
+		string changelog = this->getChangelog();
+		if (changelog != "")
+			message += "\nChangelog:\n"+changelog;
+
 		u32 messageSize = message.size();
 		u16 title16[sizeof(title8)];
 		u16 message16[messageSize + 1];
@@ -158,14 +158,7 @@ Result Updater::downloadUpdate()
 
 	if (res == 0)
 	{
-		string ciaUrl = "";
-		char urlString[downloadSize + 1];
-		for (u32 i = 0; i<downloadSize; i++)
-		{
-			urlString[i] = (char)downloadResult[i];
-		}
-		urlString[downloadSize] = '\0';
-		ciaUrl = string(urlString);
+		string ciaUrl = getStringFromDownload(downloadSize, downloadResult);
 		free(downloadResult);
 		res = download(&ciaUrl, &downloadSize, &downloadResult);
 		if (res == 0)
@@ -185,6 +178,27 @@ Result Updater::downloadUpdate()
 	}
 
 	return 0;
+}
+
+
+string Updater::getChangelog()
+{
+	size_t downloadSize = 0;
+	u8* downloadResult = nullptr;
+	string changelog = "";
+	string fileName = this->onlineVersionString + ".log";
+	string url = mainDownloadUrl;
+	if (this->updaterSettings->getValue(SETTINGS_DEV_BUILDS))
+		url = mainDownloadUrlDev;
+	url += fileName;
+
+	Result res = download(&url, &downloadSize, &downloadResult);
+	
+	if (res == 0)
+	{
+		changelog = getStringFromDownload(downloadSize, downloadResult);
+	}
+	return changelog;
 }
 
 

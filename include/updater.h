@@ -24,6 +24,7 @@ private:
 	Result checkVersion();
 	Result createUpdateNotification();
 	Result downloadUpdate();
+	std::string getChangelog();
 	Result installUpdate();
 	
 	Result download(std::string* url,size_t* filesize,u8** file);

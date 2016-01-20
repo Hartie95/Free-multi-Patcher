@@ -33,6 +33,6 @@ static const std::string versionCheckUrl = mainUrl + "version.txt";
 static const std::string mainDownloadUrlDev = mainUrl + "devUpdates/";
 static const std::string VersionCheckUrlDev = mainUrl + "devVersion.txt";
 
-static const u32 version=0x00060366;
+static const u32 version=0x00060368;
 
 std::string generateVersionString(u32 version);
