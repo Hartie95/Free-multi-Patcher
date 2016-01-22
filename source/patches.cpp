@@ -1,12 +1,167 @@
-#include <string.h>
-#include <stdlib.h>
 #include <stdio.h>
-#include <3ds.h>
+#include <string.h>
+#include <citrus/fs.hpp>
+#include <stdlib.h>
 
-#include "constants.h"
 #include "patches.h"
-#include "kernel11.h"
-#include "kobjects.h"
+
+using namespace std;
+using namespace ctr;
+
+    
+Patch::Patch(binPatch *_patch)
+{
+    u32 processNamePosition=_patch->patchNameSize+_patch->descriptionSize;
+
+    this->patchName.assign(_patch->binaryData,_patch->patchNameSize);
+    this->description.assign(&(_patch->binaryData[_patch->patchNameSize]),_patch->descriptionSize);
+    this->processName.assign(&(_patch->binaryData[processNamePosition]),_patch->processNameSize);
+
+    this->minKernelVersion = _patch->minKernelVersion;
+    this->maxKernelVersion = _patch->maxKernelVersion;
+    this->minFirmwareVersion = _patch->minFirmwareVersion;
+    this->maxFirmwareVersion = _patch->maxFirmwareVersion;
+    this->devicesSupported = _patch->devicesSupported;
+    this->regionsSupported = _patch->regionsSupported;
+    this->nandCompability = _patch->nandCompability;
+
+    this->patchType = _patch->patchType;
+    this->startAddressProcess = _patch->startAddressProcess;
+    this->startAddressGlobal = _patch->startAddressGlobal;
+    this->searchAreaSize = _patch->searchAreaSize;
+    this->numberOfReplacements = _patch->numberOfReplacements;
+    this->patchOffset = _patch->patchOffset;
+
+    u32 originalcodeSize=_patch->originalcodeSize;
+    u8* originalcode = (u8*) malloc(originalcodeSize);
+    u32 originalCodePosition=_patch->patchNameSize+_patch->descriptionSize+_patch->processNameSize;
+    memcpy(originalcode,&(_patch->binaryData[originalCodePosition]),originalcodeSize);
+    this->originalCode={originalcodeSize, originalcode};
+    
+    u32 patchcodeSize=_patch->patchcodeSize;
+    u8* patchcode = (u8*) malloc(patchcodeSize);
+    u32 patchCodePosition=originalCodePosition+originalcodeSize;
+    memcpy(patchcode,&(_patch->binaryData[patchCodePosition]),patchcodeSize);
+    this->patchCode={patchcodeSize, patchcode};
+
+    this->changeStatus(true);
+}
+
+Patch::~Patch()
+{
+    free(this->originalCode.code);
+    free(this->patchCode.code);
+}
+
+string Patch::getPatchName()
+{
+    return this->patchName;
+}
+
+string Patch::getDescription()
+{
+    return this->description;
+}
+
+string Patch::getProcessName()
+{
+    return this->processName;
+}
+
+
+kernelVersion Patch::getMinKernelVersion()
+{
+    return this->minKernelVersion;
+}
+
+kernelVersion Patch::getMaxKernelVersion()
+{
+    return this->maxKernelVersion;
+}
+
+firmwareVersion Patch::getMinFirmwareVersion()
+{
+	return this->minFirmwareVersion;
+}
+
+firmwareVersion Patch::getMaxFirmwareVersion()
+{
+	return this->maxFirmwareVersion;
+}
+
+devices Patch::getDevicesSupported()
+{
+    return this->devicesSupported;
+}
+
+regions Patch::getRegionsSupported()
+{
+    return this->regionsSupported;
+}
+
+nands Patch::getNandCompability()
+{
+    return this->nandCompability;
+}
+
+
+u8 Patch::getPatchType()
+{
+    return this->patchType;
+}
+
+u32 Patch::getStartAddressProcess()
+{
+    return this->startAddressProcess;
+}
+
+u32 Patch::getStartAddressGlobal()
+{
+    return this->startAddressGlobal;
+}
+
+u32 Patch::getSearchAreaSize()
+{
+    return this->searchAreaSize;
+}
+
+u32 Patch::getNumberOfReplacements()
+{
+    return this->numberOfReplacements;
+}
+
+u32 Patch::getPatchOffset()
+{
+    return this->patchOffset;
+}
+
+code Patch::getOriginalCode()
+{
+    return this->originalCode;
+}
+
+code Patch::getPatchCode()
+{
+    return this->patchCode;
+}
+
+
+bool Patch::changeStatus()
+{
+    return this->changeStatus(!this->enabled);
+}
+
+bool Patch::changeStatus(bool status)
+{
+    this->enabled=status;
+    return this->enabled;
+}
+
+bool Patch::isEnabled()
+{
+    return this->enabled;
+}
+
 
 //-----------------------------------------------------------------------------
 /*
@@ -49,161 +204,9 @@ void PatchSrvAccess()
 */
 //-----------------------------------------------------------------------------
 
-int findAndPatchCode( const char* titleId, short titleIdSize,  const u32 startAddress, const u32 area,  unsigned char originalcode[], const char patchcode[],u32 patchcodeSize)
-{
-    KCodeSet* code_set = FindTitleCodeSet(titleId,titleIdSize);
-    if (code_set == nullptr)
-        return 1;
-
-    unsigned char * startAddressPointer = (unsigned char*)FindCodeOffsetKAddr(code_set, startAddress);
-    unsigned char * destination=nullptr;
-    for(unsigned int i = 0; i < area && destination==nullptr; i+=4)
-    {  
-        //check for the original code position
-        if( (*((unsigned int*)(startAddressPointer + i + 0x0)) == *((unsigned int*)&originalcode[0x0])) &&  
-            (*((unsigned int*)(startAddressPointer + i + 0x4)) == *((unsigned int*)&originalcode[0x4])) &&  
-            (*((unsigned int*)(startAddressPointer + i + 0x8)) == *((unsigned int*)&originalcode[0x8])) &&  
-            (*((unsigned int*)(startAddressPointer + i + 0xC)) == *((unsigned int*)&originalcode[0xC])))
-        {    
-            destination = startAddressPointer + i;
-        }  
-    }  
-
-    //Apply patches, if the address was found
-    if(destination!=nullptr)
-        memcpy(destination, patchcode, patchcodeSize);
-    else
-        return 2;
-    
-    return 0;
-}
-
-int findAndReplace( const char * titleId, short titleIdSize,  const u32 startAddress, const u32 area, short numberOfReplaces,  unsigned char originalcode[],u32 originalcodeSize,const char patchcode[],u32 patchcodeSize)
-{
-    KCodeSet* code_set = FindTitleCodeSet(titleId,titleIdSize);
-    if (code_set == nullptr)
-        return 1;
-
-    int numberOfFounds=0;
-    unsigned char * startAddressPointer = (unsigned char*)FindCodeOffsetKAddr(code_set, startAddress);
-    unsigned char * destination[numberOfReplaces];
-    
-    for(int i=0;i<numberOfReplaces;i++)
-    {
-        destination[i]=nullptr;
-    }
-
-    for(unsigned int i = 0; i < area && numberOfFounds<=numberOfReplaces; i+=4)
-    {  
-        //check for the original code position
-        bool found=true;
-        for(unsigned int x = 0;x<originalcodeSize&&found==true;x+=4)
-        {
-            if((*((unsigned int*)(startAddressPointer + i + x)) != *((unsigned int*)&originalcode[x])))
-                found=false;
-        }
-        if( found==true)
-        {    
-            destination[numberOfFounds] = startAddressPointer + i;
-            numberOfFounds++;
-        }  
-    }  
-
-    //Apply patches, if the addresses was found
-    for(int i = 0; i < numberOfFounds && destination[i]!=nullptr; i++)
-    {  
-        memcpy(destination[i], patchcode, patchcodeSize);
-    }  
-    
-    return 0;
-}
-
-int patchNimEshop()
-{
-    // Set generell informations for patching
-    static const char * titleId = "nim";
-    static const u32 startAddress = 0x00001000;
-
-    // Patch nim to answer, that no update is available
-    // 9.0.0 Address: 0x0000DD28
-    static unsigned char originalcode[] = { 0x35, 0x22, 0x10, 0xB5, 0xD2, 0x01, 0x80, 0x18, 0x00, 0x79, 0x00, 0x28, 0x03, 0xD0, 0x08, 0x46};
-    static const char patchcode[] = { 0x00, 0x20, 0x08, 0x60, 0x70, 0x47 };
-    findAndPatchCode(titleId, 3, startAddress, 0x00010000, originalcode, patchcode, sizeof(patchcode));
-
-    return 0;
-}
-
-int patchNimAutoUpdate()
-{
-    // Set generell informations for patching
-    static const char * titleId = "nim";
-    static const u32 startAddress = 0x00001000;
-
-    // Patch nim to stop automatic update download(could be unstable)
-    // 9.0.0 Address: 0x0000EA00
-    static unsigned char originalcode[] = { 0x25, 0x79, 0x0B, 0x99, 0x00, 0x24, 0x00, 0x2D, 0x29, 0xD0, 0x16, 0x4D, 0x2D, 0x68, 0x01, 0x91};
-    static char patchcode[] = { 0xE3, 0xA0, 0x00, 0x00 };
-    findAndPatchCode(titleId, 3, startAddress, 0x00010000, originalcode, patchcode, sizeof(patchcode));
-
-    return 0;
-}
-
-int patchRegionFree()
-{
-    patchMenu();
-    patchNs();
-    return 0;
-}
-
-int patchMenu()
-{
-    // Set generell informations for patching
-    static const char * titleId = "menu";
-    static const u32 startAddress = 0x00100000;
-
-    // patch Homemenu to show out of region applications
-    // 9.0.0 Address: 0x00101B8C;
-    static unsigned char originalcode[] = { 0x00, 0x00, 0x55, 0xE3, 0x01, 0x10, 0xA0, 0xE3, 0x11, 0x00, 0xA0, 0xE1, 0x03, 0x00, 0x00, 0x0A };  
-    static char patchcode[] = { 0x01, 0x00, 0xA0, 0xE3, 0x70, 0x80, 0xBD, 0xE8 };
-    findAndPatchCode(titleId, 4, startAddress, 0x00100000, originalcode, patchcode, sizeof(patchcode));
-
-    return 0;
-}
-
-int patchNs()
-{
-    // Set generell informations for patching
-    static const char * titleId = "ns";
-    static const u32 startAddress = 0x00018000;
-
-    // patch NS to return update doesnt need to be installed intead of CVer not found error code after Update Check
-    // 9.0.0 Addresses: 0x00102acc, 0x001894f4;
-    static char patchcode[] = { 0x0B, 0x18, 0x21, 0xC8 };  
-    static unsigned char originalcode[] = { 0x0C, 0x18, 0xE1, 0xD8 };
-    findAndReplace(titleId, 2, startAddress, 0x00010000, 2, originalcode, sizeof(originalcode), patchcode, sizeof(patchcode));
-
-    return 0;
-}
-/*
-Todo: find offsets
-int patchDlp()
-{
-    // Set generell informations for patching
-    static const char * titleId = "dlp";
-    static const u32 startAddress = 0x00008000;
-
-    // patch NS to return update doesnt need to be installed intead of CVer not found error code after Update Check
-    // 9.0.0 Addresses: 0x00102acc, 0x001894f4;
-    static char patchcode[] = { 0x0B, 0x18, 0x21, 0xC8 };  
-    static unsigned char originalcode[] = { 0x0C, 0x18, 0xE1, 0xD8 };
-    findAndReplace(titleId, 2, startAddress, 0x00010000, 2, originalcode, sizeof(originalcode), patchcode, sizeof(patchcode));
-
-    return 0;
-}*/
-
 /*
 Todo:
-//doesnt work atm(crashes)*/
+doesnt work atm(crashes)
 int changeSerial()
 {
     // Target title id
@@ -222,4 +225,105 @@ int changeSerial()
     findAndReplace(titleIdAct, 3, startAddressAct, 0x00000030, 1, orgSerial, sizeof(orgSerial), serial, sizeof(serial));
 
     return 0;
+}*/
+
+void createDefaultPatches()
+{
+    FILE *file ;
+    string filepath="";
+    
+    // Patch nim to answer, that no update is available(doesnt affect updating in systemsettings)
+    // 9.0.0 Address: 0x0000DD28  
+    char nimSpoofBytes[]=   /*patchName*/   "e-shop spoof"
+                            /*description*/ "Patches nim for E-Shop access"
+                            /*processname*/ "nim"
+                            /*OriginalCode*/"\x35\x22\x10\xB5\xD2\x01\x80\x18\x00\x79\x00\x28\x03\xD0\x08\x46" 
+                            /*patchBegin*/  "\x00\x20\x08\x60\x70\x47";
+
+    u32 nimSpoofSize = sizeof(binPatch) + sizeof(nimSpoofBytes);
+    binPatch* nimSpoofPatch = (binPatch*)malloc(nimSpoofSize);
+    
+    nimSpoofPatch->version              = 0x00;
+    nimSpoofPatch->patchSize            = nimSpoofSize;
+    nimSpoofPatch->patchNameSize        = 12;
+    nimSpoofPatch->descriptionSize      = 29;
+    nimSpoofPatch->processNameSize      = 3;
+    nimSpoofPatch->originalcodeSize     = 16;
+    nimSpoofPatch->patchcodeSize        = 6;
+    nimSpoofPatch->processType          = 0x01;
+    nimSpoofPatch->minKernelVersion     = {0x00, 0x00, 0x00, 0x00};
+    nimSpoofPatch->maxKernelVersion     = {0xFF, 0xFF, 0xFF, 0xFF};
+    nimSpoofPatch->minFirmwareVersion   = { 9, 0, 0, 20 };
+    nimSpoofPatch->maxFirmwareVersion   = {0xFF, 0xFF, 0xFF, 0xFF};
+    nimSpoofPatch->devicesSupported     = {1,1,1,1,1,0};
+    nimSpoofPatch->regionsSupported     = {1,1,1,1,1,1,1,0};
+    nimSpoofPatch->nandCompability      = {1,1,0};
+    nimSpoofPatch->patchType            = 0x00;
+    nimSpoofPatch->startAddressProcess  = 0x00001000;
+    nimSpoofPatch->startAddressGlobal   = 0x26A00000;
+    nimSpoofPatch->searchAreaSize       = 0x00100000;
+    nimSpoofPatch->numberOfReplacements = 0x01;
+    nimSpoofPatch->patchOffset          = 0;
+
+    memcpy(nimSpoofPatch->binaryData, nimSpoofBytes, sizeof(nimSpoofBytes));
+
+    string nimSpoofPatchFileName="nimSpoof"+patchExtension;
+
+    filepath=patchesFolder+nimSpoofPatchFileName;
+    file = fopen(filepath.c_str(),"wb"); 
+    if (file == NULL) 
+    {
+        file = fopen(filepath.c_str(),"cb"); 
+    }
+    fwrite(nimSpoofPatch, 1, (nimSpoofSize), file);
+    fclose(file);
+    free(nimSpoofPatch);
+
+
+    // Patch nim to stop automatic update download(could be unstable)
+    // 9.0.0 Address: 0x0000EA00    
+    char nimUpdateBytes[]=   /*patchName*/  "no auto download"
+                            /*description*/ "Patch nim to stop automatic update download(could be unstable)"
+                            /*processname*/ "nim"
+                            /*OriginalCode*/"\x25\x79\x0B\x99\x00\x24\x00\x2D\x29\xD0\x16\x4D\x2D\x68\x01\x91" 
+                            /*patchBegin*/  "\xE3\xA0\x00\x00";
+
+    u32 nimUpdateSize = sizeof(binPatch) + sizeof(nimUpdateBytes);
+    binPatch* nimUpdatePatch = (binPatch*)malloc(nimUpdateSize);
+    
+    nimUpdatePatch->version              = 0x00;
+    nimUpdatePatch->patchSize            = nimUpdateSize;
+    nimUpdatePatch->patchNameSize        = 16;
+    nimUpdatePatch->descriptionSize      = 62;
+    nimUpdatePatch->processNameSize      = 3;
+    nimUpdatePatch->originalcodeSize     = 16;
+    nimUpdatePatch->patchcodeSize        = 4;
+    nimUpdatePatch->processType          = 0x01;
+    nimUpdatePatch->minKernelVersion     = {0x00, 0x00, 0x00, 0x00};
+    nimUpdatePatch->maxKernelVersion     = {0xFF, 0xFF, 0xFF, 0xFF};
+    nimUpdatePatch->minFirmwareVersion   = { 4, 0, 0, 0 };
+    nimUpdatePatch->maxFirmwareVersion   = {0xFF, 0xFF, 0xFF, 0xFF};
+    nimUpdatePatch->devicesSupported     = {1,1,1,1,1,0};
+    nimUpdatePatch->regionsSupported     = {1,1,1,1,1,1,1,0};
+    nimUpdatePatch->nandCompability      = {1,1,0};
+    nimUpdatePatch->patchType            = 0x00;
+    nimUpdatePatch->startAddressProcess  = 0x00001000;
+    nimUpdatePatch->startAddressGlobal   = 0x26A00000;
+    nimUpdatePatch->searchAreaSize       = 0x00010000;
+    nimUpdatePatch->numberOfReplacements = 0x01;
+    nimUpdatePatch->patchOffset          = 0;
+
+    memcpy(nimUpdatePatch->binaryData, nimUpdateBytes, sizeof(nimUpdateBytes));
+
+    string nimUpdatePatchFileName="nimUpdate"+patchExtension;
+
+    filepath=patchesFolder+nimUpdatePatchFileName;
+    file = fopen(filepath.c_str(),"wb"); 
+    if (file == NULL) 
+    {
+        file = fopen(filepath.c_str(),"cb"); 
+    }
+    fwrite(nimUpdatePatch, 1, (nimUpdateSize), file);
+    fclose(file);
+    free(nimUpdatePatch);
 }

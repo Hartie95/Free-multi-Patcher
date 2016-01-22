@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include "constants.h"
 
 #include "kernel11.h"
@@ -39,7 +41,7 @@ void SaveVersionConstants()
     u32 kversion = *(vu32*)0x1FF80000; // KERNEL_VERSION register
 
     u8 is_n3ds = 0;
-    APT_CheckNew3DS(NULL, &is_n3ds);
+    APT_CheckNew3DS(&is_n3ds);
 
     if (kversion < 0x022C0600) {
         kproc_size = 0x260;
@@ -59,4 +61,22 @@ void SaveVersionConstants()
     }
 
     KernelBackdoor(ScanKProcList);
+}
+
+
+std::string generateVersionString(u32 version)
+{
+	//Generates Version String for the UI
+	u8 major = (u8)((version & 0xff000000) >> 24);
+	u8 minor = (u8)((version & 0xff0000) >> 16);
+	u8 revision = (u8)((version & 0xff00) >> 8); //BetaRelease ID
+	u8 build = (u8)version & 0xff;//internal build ID
+
+	std::stringstream versionStream;
+	versionStream << "v" << std::hex << (u32)major
+		<< "." << std::hex << (u32)minor;
+	//Check for beta release
+	if (build < 0xff)
+		versionStream << "-Beta" << std::hex << (u32)revision << "(" << std::hex << (u32)build << ")";
+	return versionStream.str();
 }
