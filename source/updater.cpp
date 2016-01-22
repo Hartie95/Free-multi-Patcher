@@ -37,7 +37,7 @@ Updater::Updater(MenuManager* manager, bool* exitLoop)
 Result Updater::checkForUpdate()
 {
 	Result ret = checkVersion();
-	if (this->onlineVersion > 0)
+	if (this->onlineVersion > version)
 	{
 		if (this->updaterSettings->getValue(SETTINGS_UPDATE_NOTIFICATION))
 			this->createUpdateNotification();
@@ -57,7 +57,7 @@ Result Updater::updateApplication()
 	Result res = 0;
 	if (this->onlineVersion == 0)
 		this->checkVersion();
-	if (this->onlineVersion>0)
+	if (this->onlineVersion>version)
 	{
 		res = this->downloadUpdate();
 		if (res == 0)
