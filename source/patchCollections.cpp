@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <ctrcommon/fs.hpp>
 #include <stdlib.h>
 
 #include "patchCollections.h"
