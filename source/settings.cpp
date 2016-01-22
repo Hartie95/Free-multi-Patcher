@@ -31,6 +31,7 @@ bool initGlobalSettings()
 	globalSettings->addElement("ignoreKernelCollection", false);
 	globalSettings->addElement("ignoreRegionCollection", false);
 	globalSettings->addElement("ignoreDeviceTypeCollection", false);
+	globalSettings->addElement(SETTINGS_AUTOBOOT, false);
 	globalSettings->loadSettings(globalSettingsFileName);
 	return true;
 }

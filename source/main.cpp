@@ -66,7 +66,8 @@ int main(int argc, char **argv) {
     return 0;
     }
    
-    bool exitLoop=false;
+	bool exitLoop = false;
+	bool autoboot = false;
     menuManager = new MenuManager(&exitLoop);
 
     patchManager = new PatchManager();
@@ -74,6 +75,23 @@ int main(int argc, char **argv) {
     patchManager->createPatchPage(menuManager);
 	globalSettings->createMenuPage(menuManager);
 	updater = new Updater(menuManager,&exitLoop);
+	autoboot = globalSettings->getValue(SETTINGS_AUTOBOOT);
+	if ( autoboot == true)
+	{
+		for (u32 i = 100000; i > 0 && core::running()&&autoboot==true; i--)
+		{
+			hid::poll();
+			if (hid::pressed(hid::BUTTON_L))
+				autoboot = false;
+		}
+		if (autoboot == true)
+		{
+			KernelBackdoor(&applyPatches);
+			cleanup();
+			return 0;
+		}
+
+	}
 
     while(core::running()&&exitLoop==false) 
     {

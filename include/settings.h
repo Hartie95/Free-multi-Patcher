@@ -4,6 +4,7 @@
 #include <map>
 #include "menuManager.h"
 
+#define SETTINGS_AUTOBOOT "EnableAutoboot"
 #define SETTINGSMAP std::map<std::string, u32>
 
 bool initGlobalSettings();
